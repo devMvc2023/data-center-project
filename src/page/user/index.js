@@ -3,6 +3,7 @@ import { GetAll } from "api";
 import { repairs_icon, textColor } from "array-data/repairs_icon";
 import Breadcrumbs from "component/common/breadcrumbs";
 import CollapseComplete from "component/common/collapse";
+import { Select } from "component/common/form";
 import {
   Button,
   Group2,
@@ -11,7 +12,9 @@ import {
 import Pagination from "component/common/pagination";
 import Table from "component/common/table";
 import { breakpoint, FindData } from "component/common/util";
+import LoadingPage from "component/element/loading";
 import { SortData } from "component/element/rehearsal";
+import EditNotify from "component/element/rehearsal/edit-notify";
 import RehearsalDetail from "component/element/rehearsal/rehearsalDetail";
 import UserDetail from "component/element/user/user-detail";
 import useProfile from "hooks/useProfile";
@@ -24,15 +27,69 @@ export default function User() {
   const [currentWorkPage, setCurrentWorkPage] = useState(1);
   const [dataDetail, setDataDetail] = useState();
   const [dataDetail2, setDataDetail2] = useState();
+  const [loading2, setLoading2] = useState(false);
+  const [filterData, setFilterData] = useState([]);
+  const [filterData2, setFilterData2] = useState([]);
+  const [userData, setUserData] = useState(false);
+  const [open, setOpen] = useState(true);
+  const [open2, setOpen2] = useState(true);
+  const [edit, setEdit] = useState(false);
 
-  const { profile } = useProfile();
+  const { profile, loading, setLoading } = useProfile();
 
   const paginateData = (pageNumber) => setCurrentDataPage(pageNumber);
   const paginateWork = (pageNumber) => setCurrentWorkPage(pageNumber);
 
+  const onFilter = (event) => {
+    let data = [];
+
+    if (event.target.value !== "ทั้งหมด")
+      data = notifyData?.filter((d) => d.status === event.target.value);
+
+    if (event.target.value === "ทั้งหมด") data = notifyData;
+
+    setFilterData(data);
+  };
+
+  const onFilter2 = (event) => {
+    let data = [];
+
+    if (event.target.value !== "ทั้งหมด")
+      data = notifyData?.filter((d) => d.status === event.target.value);
+
+    if (event.target.value === "ทั้งหมด") data = notifyData;
+
+    setFilterData2(data);
+  };
+
+  const onOpen = (data) => {
+    setOpen(true);
+    setDataDetail(data);
+  };
+
+  const onOpen2 = (data) => {
+    setOpen2(true);
+    setDataDetail2(data);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+    setOpen2(false);
+    setDataDetail(null);
+    setDataDetail2(null);
+  };
+
+  const onCloseEdit = () => {
+    setEdit(false);
+    setDataDetail(null);
+  };
+
   useEffect(() => {
     const getData = async () => {
+      if (filterData.length === 0) setLoading2(true);
+      setLoading(false);
       const res = await GetAll("notify_data");
+      const user = await GetAll("user");
 
       res.map((data) => {
         const notify_date = new Date(data.notify_date.seconds * 1000);
@@ -75,60 +132,73 @@ export default function User() {
       const myNotifyWork = SortData(notifyWork);
 
       setNotifyWork(myNotifyWork);
+      setFilterData(notifyData);
+      setUserData(user);
+      if (filterData.length === 0) setLoading2(false);
     };
 
     getData();
-  }, [profile]);
+  }, [profile, loading]);
 
   // get Current page
   const perPageData = 8;
   const indexOfLastData = currentDataPage * perPageData;
   const indexOfFirstData = indexOfLastData - perPageData;
-  const currentData = notifyData?.slice(indexOfFirstData, indexOfLastData);
+  const currentData = filterData?.slice(indexOfFirstData, indexOfLastData);
 
   const perPageWork = 12;
   const indexOfLastWork = currentWorkPage * perPageWork;
   const indexOfFirstWork = indexOfLastWork - perPageWork;
-  const currentWork = notifyWork?.slice(indexOfFirstWork, indexOfLastWork);
+  const currentWork = filterData2?.slice(indexOfFirstWork, indexOfLastWork);
 
   return (
-    <StyleExtendsSection>
-      <Breadcrumbs
-        className="user-breadcrumbs"
-        icon="fas fa-user"
-        title="บัญชีของฉัน"
-      />
+    <>
+      <StyleExtendsSection>
+        {!edit ? (
+          <>
+            <Breadcrumbs
+              className="user-breadcrumbs"
+              icon="fas fa-user"
+              title="บัญชีของฉัน"
+            />
 
-      <Group2 className="user-group">
-        <div className="user-collapse">
-          <CollapseComplete
-            classNameTitle="-title"
-            title="ข้อมูลเกี่ยวกับบัญชี"
-          >
-            <UserDetail data={profile} />
-          </CollapseComplete>
-        </div>
+            <Group2 className="user-group">
+              <div className="user-collapse">
+                <CollapseComplete
+                  classNameTitle="-title"
+                  title="ข้อมูลเกี่ยวกับบัญชี"
+                >
+                  <UserDetail data={profile} />
+                </CollapseComplete>
+              </div>
 
-        <div className="user-collapse">
-          <CollapseComplete
-            classNameTitle="-title"
-            title="ข้อมูลการขอรับบริการของฉัน"
-          >
-            <Table
-              th={[
-                "ลำดับ",
-                "วันที่ขอรับบริการ",
-                "ผู้ดำเนินการ",
-                "สถานะ",
-                "รายละเอียด",
-              ]}
-              td={currentData?.map((data, index) => (
-                <tr
-                  className={`body ${
-                    data.urgent === "ด่วน" && data.status !== "ปิดงาน"
-                      ? "text-info"
-                      : ""
-                  }
+              <div className="user-collapse">
+                <CollapseComplete
+                  classNameTitle="-title"
+                  title="ข้อมูลการขอรับบริการของฉัน"
+                >
+                  <Select
+                    width="fit-content"
+                    margin="0 0 10px auto"
+                    className="rehearsal-filter"
+                    data={["ทั้งหมด", "รอคิว", "กำลังดำเนินการ", "ปิดงาน"]}
+                    onChange={onFilter}
+                  />
+                  <Table
+                    th={[
+                      "ลำดับ",
+                      "วันที่ขอรับบริการ",
+                      "ผู้ดำเนินการ",
+                      "สถานะ",
+                      "รายละเอียด",
+                    ]}
+                    td={currentData?.map((data, index) => (
+                      <tr
+                        className={`body ${
+                          data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                            ? "text-info"
+                            : ""
+                        }
                   ${
                     data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
                       ? "text-warning"
@@ -139,84 +209,94 @@ export default function User() {
                       ? "text-danger"
                       : ""
                   }`}
-                  key={index}
-                >
-                  <td className="text-center">
-                    {currentDataPage > 1
-                      ? index + 1 + indexOfFirstData
-                      : index + 1}
-                  </td>
-                  <td className="date text-center">
-                    {data.urgent === "ด่วน" && (
-                      <span className="text-danger"></span>
-                    )}
-                    {data.notify_date}
-                  </td>
+                        key={index}
+                      >
+                        <td className="text-center">
+                          {currentDataPage > 1
+                            ? index + 1 + indexOfFirstData
+                            : index + 1}
+                        </td>
+                        <td className="date text-center">
+                          {data.urgent === "ด่วน" && (
+                            <span className="text-danger"></span>
+                          )}
+                          {data.notify_date}
+                        </td>
 
-                  <td className="contractor">{data.contractor}</td>
-                  <td
-                    className={`status text-center ${FindData(
-                      data.status,
-                      textColor
-                    )}`}
-                  >
-                    {data.status}
-                  </td>
-                  <td className="detail">
-                    <Button
-                      margin="6px auto 0 auto"
-                      padding="0"
-                      fontSize="14px"
-                      height="30px"
-                      onClick={() => setDataDetail(data)}
-                    >
-                      ดูรายละเอียด
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            />
-            {currentData?.length === 0 && (
-              <div className="not-have">ยังไม่มีการขอรับบริการ</div>
-            )}
-            {dataDetail && (
-              <RehearsalDetail
-                data={dataDetail}
-                onClose={() => setDataDetail(null)}
-              />
-            )}
+                        <td className="contractor">{data.contractor}</td>
+                        <td
+                          className={`status text-center ${FindData(
+                            data.status,
+                            textColor
+                          )}`}
+                        >
+                          {data.status}
+                        </td>
+                        <td className="detail">
+                          <Button
+                            margin="6px auto 0 auto"
+                            padding="0"
+                            fontSize="14px"
+                            height="30px"
+                            onClick={() => onOpen(data)}
+                          >
+                            ดูรายละเอียด
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  />
+                  {currentData?.length === 0 && (
+                    <div className="not-have">ยังไม่มีการขอรับบริการ</div>
+                  )}
+                  {dataDetail && (
+                    <RehearsalDetail
+                      userData={userData}
+                      data={dataDetail}
+                      open={open}
+                      onClose={onClose}
+                      onEdit={() => setEdit(true)}
+                    />
+                  )}
 
-            <Pagination
-              perPage={perPageData}
-              totalData={notifyData?.length}
-              paginate={paginateData}
-              page={currentDataPage}
-            />
-          </CollapseComplete>
-        </div>
-      </Group2>
-      {profile?.role !== "member" && (
-        <div className={"notify-work"}>
-          <CollapseComplete title="ข้อมูลงานของฉัน">
-            <Table
-              className={"my-work"}
-              th={[
-                "ลำดับ",
-                "วันที่ขอรับบริการ",
-                "ผู้ขอรับบริการ",
-                "วันที่ดำเนินการ",
-                "รายการบริการ",
-                "สถานะ",
-                "สถานะการดำเนินการ",
-                "รายละเอียด",
-              ]}
-              td={currentWork?.map((data, index) => (
-                <tr
-                  className={`body ${
-                    data.urgent === "ด่วน" && data.status !== "ปิดงาน"
-                      ? "text-info"
-                      : ""
-                  }
+                  <Pagination
+                    perPage={perPageData}
+                    totalData={notifyData?.length}
+                    paginate={paginateData}
+                    page={currentDataPage}
+                  />
+                </CollapseComplete>
+              </div>
+            </Group2>
+            {profile?.role !== "member" && (
+              <div className={"notify-work"}>
+                <CollapseComplete title="ข้อมูลงานของฉัน">
+                  <Select
+                    width="fit-content"
+                    margin="0 0 10px auto"
+                    className="rehearsal-filter"
+                    data={["ทั้งหมด", "รอคิว", "กำลังดำเนินการ", "ปิดงาน"]}
+                    onChange={onFilter2}
+                  />
+                  <Table
+                    className={"my-work"}
+                    th={[
+                      "ลำดับ",
+                      "วันที่ขอรับบริการ",
+                      "ผู้ขอรับบริการ",
+                      "วันที่ดำเนินการ",
+                      "รายการบริการ",
+                      "สถานะ",
+                      "สถานะการดำเนินการ",
+                      "รายละเอียด",
+                    ]}
+                    td={currentWork?.map((data, index) => (
+                      <tr
+                        className={`body ${
+                          data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                            ? "text-info"
+                            : ""
+                        }
                   ${
                     data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
                       ? "text-warning"
@@ -227,69 +307,83 @@ export default function User() {
                       ? "text-danger"
                       : ""
                   }`}
-                  key={index}
-                >
-                  <td className="text-center">
-                    {currentWorkPage > 1
-                      ? index + 1 + indexOfFirstWork
-                      : index + 1}
-                  </td>
-                  <td className="date text-center">
-                    {data.urgent === "ด่วน" && (
-                      <span className="text-danger"></span>
-                    )}
-                    {data.notify_date}
-                  </td>
-                  <td className="name">{data.user_name}</td>
-                  <td className="text-center">{data.execution_date}</td>
-                  <td className="repairs-list">
-                    <i className={FindData(data.repairs_list, repairs_icon)} />
-                    <div>{data.repairs_list}</div>
-                  </td>
-                  <td className="text-center">{data.urgent}</td>
-                  <td
-                    className={`status text-center ${FindData(
-                      data.status,
-                      textColor
-                    )}`}
-                  >
-                    {data.status}
-                  </td>
-                  <td className="detail">
-                    <Button
-                      margin="6px auto 0 auto"
-                      padding="0"
-                      fontSize="14px"
-                      height="30px"
-                      onClick={() => setDataDetail2(data)}
-                    >
-                      ดูรายละเอียด
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            />
+                        key={index}
+                      >
+                        <td className="text-center">
+                          {currentWorkPage > 1
+                            ? index + 1 + indexOfFirstWork
+                            : index + 1}
+                        </td>
+                        <td className="date text-center">
+                          {data.urgent === "ด่วน" && (
+                            <span className="text-danger"></span>
+                          )}
+                          {data.notify_date}
+                        </td>
+                        <td className="name">{data.user_name}</td>
+                        <td className="text-center">{data.execution_date}</td>
+                        <td className="repairs-list">
+                          <i
+                            className={FindData(
+                              data.repairs_list,
+                              repairs_icon
+                            )}
+                          />
+                          <div>{data.repairs_list}</div>
+                        </td>
+                        <td className="text-center">{data.urgent}</td>
+                        <td
+                          className={`status text-center ${FindData(
+                            data.status,
+                            textColor
+                          )}`}
+                        >
+                          {data.status}
+                        </td>
+                        <td className="detail">
+                          <Button
+                            margin="6px auto 0 auto"
+                            padding="0"
+                            fontSize="14px"
+                            height="30px"
+                            onClick={() => onOpen2(data)}
+                          >
+                            ดูรายละเอียด
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  />
 
-            {currentWork?.length === 0 && (
-              <div className="not-have">ยังไม่มีงาน</div>
-            )}
-            {dataDetail2 && (
-              <RehearsalDetail
-                data={dataDetail2}
-                onClose={() => setDataDetail2(null)}
-              />
-            )}
+                  {currentWork?.length === 0 && (
+                    <div className="not-have">ยังไม่มีงาน</div>
+                  )}
+                  {dataDetail2 && (
+                    <RehearsalDetail
+                      userData={userData}
+                      data={dataDetail2}
+                      open={open2}
+                      onClose={onClose}
+                      onEdit={() => setEdit(true)}
+                    />
+                  )}
 
-            <Pagination
-              perPage={perPageWork}
-              totalData={notifyWork?.length}
-              paginate={paginateWork}
-              page={currentWorkPage}
-            />
-          </CollapseComplete>
-        </div>
-      )}
-    </StyleExtendsSection>
+                  <Pagination
+                    perPage={perPageWork}
+                    totalData={notifyWork?.length}
+                    paginate={paginateWork}
+                    page={currentWorkPage}
+                  />
+                </CollapseComplete>
+              </div>
+            )}
+          </>
+        ) : (
+          <EditNotify data={dataDetail} onCloseEdit={onCloseEdit} />
+        )}
+      </StyleExtendsSection>
+      <LoadingPage loading={loading2 || loading} />
+    </>
   );
 }
 

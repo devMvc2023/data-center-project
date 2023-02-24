@@ -9,6 +9,7 @@ function Input({
   placeholder,
   placeholder2,
   errorMsg,
+  checked,
   name,
   style,
   value,
@@ -17,6 +18,7 @@ function Input({
   disabled = false,
   required = false,
   pattern,
+  onChange = () => null,
   radioClick = () => null,
   ...props
 }) {
@@ -33,11 +35,13 @@ function Input({
               type={type}
               name={name}
               defaultValue={defaultValue}
+              value={value}
               required={required}
               disabled={disabled}
               multiple
               pattern={pattern}
               placeholder={placeholder2}
+              onChange={onChange}
             />
           </div>
         </div>
@@ -58,7 +62,14 @@ function Input({
           </label>
 
           <div>
-            <textarea name={name} required={required} disabled={disabled} />
+            <textarea
+              name={name}
+              required={required}
+              defaultValue={defaultValue}
+              disabled={disabled}
+              onChange={onChange}
+              value={value}
+            />
 
             {placeholder && (
               <div className="input-placeholder">{placeholder}</div>
@@ -87,8 +98,10 @@ function Input({
             disabled={disabled}
             value={value}
             defaultChecked={defaultChecked}
+            checked={checked}
             pattern={pattern}
             placeholder={placeholder2}
+            onChange={onChange}
           />
           <div>
             <span className="input-title">
@@ -120,6 +133,8 @@ function Input({
           required={required}
           disabled={disabled}
           placeholder={placeholder2}
+          onChange={onChange}
+          value={value}
         />
       </div>
       {placeholder && <div className="input-placeholder">{placeholder}</div>}

@@ -1,4 +1,4 @@
-import { GetAll, UPDATE } from "api";
+import { DELETE, GetAll, UPDATE } from "api";
 import { Button } from "component/common/page-layout/page-layout";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
@@ -15,6 +15,8 @@ import emailjs from "@emailjs/browser";
 export default function RehearsalDetail({
   data,
   userData,
+  open,
+  onEdit = () => null,
   onClose = () => null,
 }) {
   const [dataDetail, setDataDetail] = useState(data);
@@ -25,9 +27,7 @@ export default function RehearsalDetail({
   const [rating, setRating] = useState({ open: false });
   const [urgent, setUrgent] = useState();
   const [contractor, setContractor] = useState(data?.contractor);
-  const { loading, setLoading } = useProfile();
-
-  const { profile } = useProfile();
+  const { profile, loading, setLoading } = useProfile();
 
   const star = [1, 2, 3, 4, 5];
 
@@ -122,6 +122,24 @@ export default function RehearsalDetail({
     } catch (error) {
       console.log(
         "log >> file: rehearsalDetail.js:87 >> onRating >> error",
+        error
+      );
+    }
+  };
+
+  const onDeleteData = async () => {
+    setLoading(true);
+
+    try {
+      const res = await DELETE("notify_data", dataDetail?.data_id);
+
+      if (res === "delete success!") {
+        setLoading(true);
+        onClose();
+      }
+    } catch (error) {
+      console.log(
+        "log >> file: rehearsalDetail.js:135 >> onDelete >> error:",
         error
       );
     }
@@ -245,18 +263,42 @@ export default function RehearsalDetail({
         }
         tagButtons={
           <>
-            {dataDetail?.status === "รอคิว" &&
-              profile &&
-              profile?.role !== "member" && (
-                <Button
-                  type="button"
-                  onClick={() => onUpdateData("กำลังดำเนินการ")}
-                  margin="0 20px 0 auto"
-                  bgc="var(--red-7)"
-                >
-                  รับงาน
-                </Button>
-              )}
+            {dataDetail?.status === "รอคิว" && profile && (
+              <>
+                {profile?.data_id === dataDetail?.user_id && (
+                  <div className="d-flex">
+                    <Button
+                      type="button"
+                      margin="0 10px 0 auto"
+                      width="60px"
+                      bgc="#ff0000"
+                      onClick={onDeleteData}
+                    >
+                      ลบ
+                    </Button>
+                    <Button
+                      type="button"
+                      margin="0 0 0 auto"
+                      width="60px"
+                      bgc="#0d6efd"
+                      onClick={onEdit}
+                    >
+                      แก้ไข
+                    </Button>
+                  </div>
+                )}
+                {profile?.role !== "member" && (
+                  <Button
+                    type="button"
+                    onClick={() => onUpdateData("กำลังดำเนินการ")}
+                    margin="0 20px 0 auto"
+                    bgc="var(--green-1)"
+                  >
+                    รับงาน
+                  </Button>
+                )}
+              </>
+            )}
 
             {(dataDetail?.status === "กำลังดำเนินการ" ||
               dataDetail?.status === "รออะไหล่") &&
@@ -327,7 +369,7 @@ export default function RehearsalDetail({
               )}
           </>
         }
-        open={dataDetail?.data_id && true}
+        open={open}
         maxWidth="800px"
         onClose={onClosePopup}
         className="rehearsal-popup"
@@ -404,9 +446,16 @@ export default function RehearsalDetail({
                             <div
                               key={index}
                               className="preview-image"
-                              onClick={() => setPreview(image)}
+                              onClick={() =>
+                                setPreview(
+                                  `https://firebasestorage.googleapis.com/v0/b/data-center-service-86092.appspot.com/o/notify_images%2F${image}?alt=media&token=c31c5cf8-aa54-40a4-9235-d476d37fd4f1`
+                                )
+                              }
                             >
-                              <img src={image} alt="notify" />
+                              <img
+                                src={`https://firebasestorage.googleapis.com/v0/b/data-center-service-86092.appspot.com/o/notify_images%2F${image}?alt=media&token=c31c5cf8-aa54-40a4-9235-d476d37fd4f1`}
+                                alt="notify"
+                              />
                             </div>
                           );
                         })

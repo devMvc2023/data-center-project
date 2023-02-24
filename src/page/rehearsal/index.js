@@ -12,6 +12,7 @@ import Table from "component/common/table";
 import { breakpoint, FindData } from "component/common/util";
 import LoadingPage from "component/element/loading";
 import { SortData, RehearsalDetail } from "component/element/rehearsal";
+import EditNotify from "component/element/rehearsal/edit-notify";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
 import { repairs_icon, textColor } from "../../array-data/repairs_icon";
@@ -22,9 +23,11 @@ export default function Rehersal() {
   const [dataDetail, setDataDetail] = useState();
   const [filterData, setFilterData] = useState([]);
   const [loading2, setLoading2] = useState(false);
-  const [userData, setUserData] = useState(false);
+  const [userData, setUserData] = useState([]);
+  const [open, setOpen] = useState(true);
+  const [edit, setEdit] = useState(false);
 
-  const { loading } = useProfile();
+  const { loading, setLoading } = useProfile();
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -39,8 +42,24 @@ export default function Rehersal() {
     setFilterData(data);
   };
 
+  const onOpen = (data) => {
+    setOpen(true);
+    setDataDetail(data);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+    setDataDetail(null);
+  };
+
+  const onCloseEdit = () => {
+    setEdit(false);
+    setDataDetail(null);
+  };
+
   useEffect(() => {
     const getData = async () => {
+      setLoading(false);
       if (filterData.length === 0) setLoading2(true);
 
       const notify = await GetAll("notify_data");
@@ -92,38 +111,40 @@ export default function Rehersal() {
   return (
     <>
       <StyleExtendsSection>
-        <Breadcrumbs
-          icon="fas fa-tasks"
-          title="ระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ"
-          className="rehearsal-breadcrumbs"
-        />
-        <Contents className="rehearsal-content">
-          <Select
-            width="fit-content"
-            margin="0 0 10px auto"
-            className="rehearsal-filter"
-            data={["ทั้งหมด", "รอคิว", "กำลังดำเนินการ", "ปิดงาน"]}
-            onChange={onFilter}
-          />
+        {!edit ? (
+          <>
+            <Breadcrumbs
+              icon="fas fa-tasks"
+              title="ระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ"
+              className="rehearsal-breadcrumbs"
+            />
+            <Contents className="rehearsal-content">
+              <Select
+                width="fit-content"
+                margin="0 0 10px auto"
+                className="rehearsal-filter"
+                data={["ทั้งหมด", "รอคิว", "กำลังดำเนินการ", "ปิดงาน"]}
+                onChange={onFilter}
+              />
 
-          <Table
-            th={[
-              "ลำดับ",
-              "วันที่ขอรับบริการ",
-              "ผู้ขอรับบริการ",
-              "รายการบริการ",
-              "ผู้ดำเนินการ",
-              "สถานะ",
-              "รายละเอียด",
-            ]}
-            td={currentData?.map((data, index) => (
-              <React.Fragment key={index}>
-                <tr
-                  className={`body ${
-                    data.urgent === "ด่วน" && data.status !== "ปิดงาน"
-                      ? "text-info"
-                      : ""
-                  }
+              <Table
+                th={[
+                  "ลำดับ",
+                  "วันที่ขอรับบริการ",
+                  "ผู้ขอรับบริการ",
+                  "รายการบริการ",
+                  "ผู้ดำเนินการ",
+                  "สถานะ",
+                  "รายละเอียด",
+                ]}
+                td={currentData?.map((data, index) => (
+                  <React.Fragment key={index}>
+                    <tr
+                      className={`body ${
+                        data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                          ? "text-info"
+                          : ""
+                      }
               ${
                 data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
                   ? "text-warning"
@@ -134,61 +155,69 @@ export default function Rehersal() {
                   ? "text-danger"
                   : ""
               }`}
-                  key={index}
-                >
-                  <td className="text-center">
-                    {currentPage > 1 ? index + 1 + indexOfFirst : index + 1}
-                  </td>
-                  <td className="date text-center">{data.notify_date}</td>
-                  <td className="name">{data.user_name}</td>
-                  <td className="repairs-list">
-                    <i className={FindData(data.repairs_list, repairs_icon)} />
-                    <div>{data.repairs_list}</div>
-                  </td>
-                  <td className="contractor">{data.contractor}</td>
-                  <td
-                    className={`status text-center ${FindData(
-                      data.status,
-                      textColor
-                    )}`}
-                  >
-                    {data.status}
-                  </td>
-                  <td className="detail">
-                    <Button
-                      margin="6px auto 0 auto"
-                      padding="0"
-                      fontSize="14px"
-                      height="30px"
-                      onClick={() => setDataDetail(data)}
+                      key={index}
                     >
-                      ดูรายละเอียด
-                    </Button>
-                  </td>
-                </tr>
-              </React.Fragment>
-            ))}
-          />
-          {currentData?.length === 0 && (
-            <div className="not-have">ยังไม่มีการขอรับบริการ</div>
-          )}
-          {dataDetail && (
-            <RehearsalDetail
-              userData={userData}
-              data={dataDetail}
-              onClose={() => setDataDetail(null)}
-            />
-          )}
+                      <td className="text-center">
+                        {currentPage > 1 ? index + 1 + indexOfFirst : index + 1}
+                      </td>
+                      <td className="date text-center">{data.notify_date}</td>
+                      <td className="name">{data.user_name}</td>
+                      <td className="repairs-list">
+                        <i
+                          className={FindData(data.repairs_list, repairs_icon)}
+                        />
+                        <div>{data.repairs_list}</div>
+                      </td>
+                      <td className="contractor">{data.contractor}</td>
+                      <td
+                        className={`status text-center ${FindData(
+                          data.status,
+                          textColor
+                        )}`}
+                      >
+                        {data.status}
+                      </td>
+                      <td className="detail">
+                        <Button
+                          margin="6px auto 0 auto"
+                          padding="0"
+                          fontSize="14px"
+                          height="30px"
+                          onClick={() => onOpen(data)}
+                        >
+                          ดูรายละเอียด
+                        </Button>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              />
+              {currentData?.length === 0 && (
+                <div className="not-have">ยังไม่มีการขอรับบริการ</div>
+              )}
+              {dataDetail && (
+                <RehearsalDetail
+                  userData={userData}
+                  data={dataDetail}
+                  open={open}
+                  onClose={onClose}
+                  onEdit={() => setEdit(true)}
+                />
+              )}
 
-          <Pagination
-            perPage={perPage}
-            totalData={filterData?.length}
-            paginate={paginate}
-            page={currentPage}
-          />
-        </Contents>
+              <Pagination
+                perPage={perPage}
+                totalData={filterData?.length}
+                paginate={paginate}
+                page={currentPage}
+              />
+            </Contents>
+          </>
+        ) : (
+          <EditNotify data={dataDetail} onCloseEdit={onCloseEdit} />
+        )}
       </StyleExtendsSection>
-      <LoadingPage loading={loading2} />
+      <LoadingPage loading={loading2 || loading} />
     </>
   );
 }

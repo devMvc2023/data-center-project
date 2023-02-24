@@ -6,38 +6,28 @@ import {
   Contents,
   Group,
   Group2,
-  Section,
 } from "component/common/page-layout/page-layout";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
-import { GetAll, POST } from "api";
+import { GetAll, UPDATE } from "api";
 import { PopupJs } from "component/common/popup";
 import { useNavigate } from "react-router-dom";
 import { breakpoint, storage } from "component/common/util";
-import { ref, uploadBytes } from "firebase/storage";
+import { deleteObject, ref, uploadBytes } from "firebase/storage";
 import LoadingPage from "component/element/loading";
 
-export default function Notify() {
-  const [notifyData, setNotifyData] = useState({
-    images: [],
-    urgent: "ไม่ด่วน",
-  });
+export default function EditNotify({ data, onCloseEdit = () => null }) {
+  const [notifyData, setNotifyData] = useState(data);
   const [selectDetail, setSelectDetail] = useState([]);
   const [preview, setPreview] = useState();
   const [repairs, setRepairs] = useState();
   const [check, setCheck] = useState({});
   const [symptom, setSymptom] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
+  const [deleteimage, setDeleteimage] = useState([]);
+  const [loading2, setLoading2] = useState(false);
+  const { profile, setLoading } = useProfile();
 
   const navigate = useNavigate();
-
-  const date = new Date();
-
-  const thDate = date.toLocaleDateString("th-TH", {
-    dateStyle: "medium",
-  });
-  const thTime = date.toLocaleTimeString("th-TH");
 
   const checkData = (event) => {
     event.preventDefault();
@@ -53,7 +43,6 @@ export default function Notify() {
       symptom: symptom.length === 0 && "เลือกสิ่งที่ต้องการ",
       urgent: !notifyData?.urgent && "เลือกความด่วน",
     });
-    console.log("log >> file: index.js:29 >> Notify >> check", check);
 
     if (
       !check?.where_notify &&
@@ -74,7 +63,7 @@ export default function Notify() {
   };
 
   const onNotify = async () => {
-    setLoading(true);
+    setLoading2(true);
 
     const repairs_id = repairs?.filter(
       (d) => d.name === notifyData?.repairs_list
@@ -100,38 +89,48 @@ export default function Notify() {
 
     const nameUrl = [];
 
-    if (notifyData?.images?.length > 0) {
-      notifyData?.images?.map((image) => {
+    notifyData?.images?.map((image) => {
+      if (image.name) {
         const imageRef = ref(storage, `notify_images/${image.name}`);
 
         nameUrl.push(image?.name);
 
         uploadBytes(imageRef, image);
+      } else {
+        nameUrl.push(image);
+      }
+    });
+
+    if (deleteimage?.length > 0) {
+      deleteimage?.map((image) => {
+        const imageRef = ref(storage, `notify_images/${image}`);
+
+        deleteObject(imageRef);
       });
     }
 
     let data = {
-      user_id: profile?.data_id,
-      user_name: `${profile?.title}${profile?.first_name} ${profile?.last_name}`,
       repairs_list_id: repairs_id,
       repairs_list: notifyData.repairs_list,
       symptom: currentSymptom,
       where_notify: notifyData.where_notify || "ส่วนตัว",
       where_detail: where || "ส่วนตัว",
-      location: notifyData.location || "",
+      location:
+        notifyData.repairs_list === "ระบบ Internet"
+          ? notifyData?.location || ""
+          : "",
       note: notifyData.note || "",
-      notify_date: date,
       urgent: notifyData.urgent,
       images: nameUrl,
-      status: "รอคิว",
     };
 
     try {
-      const res = await POST("notify_data", data);
+      const res = await UPDATE("notify_data", data, notifyData?.data_id);
 
-      if (res.id) {
-        setLoading(false);
-        navigate("/rehearsal");
+      if (res === "update success!") {
+        setLoading2(false);
+        setLoading(true);
+        onCloseEdit();
       }
     } catch (error) {
       console.log(
@@ -184,19 +183,29 @@ export default function Notify() {
   };
 
   const deleteFile = (event) => {
-    const d = notifyData.images.filter((item, index) => index !== event);
+    const d = notifyData?.images.filter((item, index) => index !== event);
+    const nd = notifyData?.images.filter((item, index) => index === event);
 
-    setNotifyData({ ...notifyData, image: d });
+    if (!nd.name) {
+      setDeleteimage([...deleteimage, nd]);
+    }
+    setNotifyData({ ...notifyData, images: d });
   };
 
   useEffect(() => {
     const getData = async () => {
-      setLoading(true);
+      setLoading2(true);
 
       const repairs_list = await GetAll("repairs_list");
 
+      const currentSym = repairs_list?.find(
+        (value) => value.name === notifyData?.repairs_list
+      ).detail;
+
+      setSymptom(notifyData?.symptom);
+      setSelectDetail({ repairs_list: currentSym });
       setRepairs(repairs_list);
-      setLoading(false);
+      setLoading2(false);
     };
 
     getData();
@@ -204,7 +213,7 @@ export default function Notify() {
 
   return (
     <>
-      <StyleExtendsSection>
+      <Style>
         <Breadcrumbs
           icon="fas fa-bell"
           title="ขอรับบริการงานศูนย์ข้อมูลสารสนเทศ"
@@ -216,12 +225,9 @@ export default function Notify() {
           <form>
             <Message
               title="วันที่ขอรับบริการ"
-              detail={`${thDate} เวลา ${thTime} น.`}
+              detail={`${notifyData?.notify_date} เวลา ${notifyData?.notify_time} น.`}
             />
-            <Message
-              title="ผู้ขอรับบริการ"
-              detail={`${profile?.title}${profile?.first_name} ${profile?.last_name}`}
-            />
+            <Message title="ผู้ขอรับบริการ" detail={notifyData?.user_name} />
             <Select
               title="บริการ"
               width="fit-content"
@@ -231,7 +237,7 @@ export default function Notify() {
               name="repairs_list"
               className="notify-select"
               selectPlace="--กรุณาระบุบริการ--"
-              value={notifyData.repairs_list}
+              value={notifyData?.repairs_list}
               onSelectChange={(event) => onSelectChange(event, repairs)}
               onChange={onChangeText}
               required
@@ -263,8 +269,8 @@ export default function Notify() {
                     title={data}
                     onChange={(event) => onChangeAdd(event, index)}
                     key={index}
-                    height="fit-content"
                     checked={symptom.some((sym) => sym === data)}
+                    height="fit-content"
                   />
                 );
               })}
@@ -274,7 +280,7 @@ export default function Notify() {
                 <div className="err-message text-danger">{check?.symptom}</div>
               </Group2>
             )}
-            {notifyData.repairs_list === "ระบบ Internet" && (
+            {notifyData?.repairs_list === "ระบบ Internet" && (
               <Input
                 className="notify-input notify-textarea"
                 title="สถานที่"
@@ -283,7 +289,7 @@ export default function Notify() {
                 height="34px"
                 style={"3"}
                 name="location"
-                value={notifyData.location}
+                value={notifyData?.location}
                 onChange={onChangeText}
               />
             )}
@@ -302,23 +308,51 @@ export default function Notify() {
                   plusIcon={true}
                 />
               )}
-              {notifyData.images?.length > 0 && (
+              {notifyData?.images?.length > 0 && (
                 <div className="image-group">
-                  {notifyData.images?.map((image, index) => {
+                  {notifyData?.images?.map((image, index) => {
                     return (
                       <div className="notify-image-group" key={index}>
-                        <div
-                          className="notify-image"
-                          onClick={() => setPreview(URL.createObjectURL(image))}
-                        >
-                          <img src={URL.createObjectURL(image)} />
-                        </div>
-                        <div
-                          className="false-icon"
-                          onClick={() => deleteFile(index)}
-                        >
-                          <i className="fa fa-times" />
-                        </div>
+                        {image?.name ? (
+                          <>
+                            <div
+                              className="notify-image"
+                              onClick={() =>
+                                setPreview(URL.createObjectURL(image))
+                              }
+                            >
+                              <img src={URL.createObjectURL(image)} />
+                            </div>
+                            <div
+                              className="false-icon"
+                              onClick={() => deleteFile(index)}
+                            >
+                              <i className="fa fa-times" />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div
+                              className="notify-image"
+                              onClick={() =>
+                                setPreview(
+                                  `https://firebasestorage.googleapis.com/v0/b/data-center-service-86092.appspot.com/o/notify_images%2F${image}?alt=media&token=c31c5cf8-aa54-40a4-9235-d476d37fd4f1`
+                                )
+                              }
+                            >
+                              <img
+                                src={`https://firebasestorage.googleapis.com/v0/b/data-center-service-86092.appspot.com/o/notify_images%2F${image}?alt=media&token=c31c5cf8-aa54-40a4-9235-d476d37fd4f1`}
+                                alt="notify"
+                              />
+                            </div>
+                            <div
+                              className="false-icon"
+                              onClick={() => deleteFile(index)}
+                            >
+                              <i className="fa fa-times" />
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })}
@@ -347,6 +381,7 @@ export default function Notify() {
                   value="งาน"
                   title={"งาน"}
                   onChange={onChangeText}
+                  defaultChecked={notifyData?.where_notify === "งาน"}
                 />
               )}
 
@@ -361,6 +396,7 @@ export default function Notify() {
                     value="ภาควิชา"
                     title={"ภาควิชา"}
                     onChange={onChangeText}
+                    defaultChecked={notifyData?.where_notify === "ภาควิชา"}
                   />
                 )}
               {profile?.user_faction?.every(
@@ -379,6 +415,7 @@ export default function Notify() {
                       where_detail: "ส่วนตัว",
                     })
                   }
+                  defaultChecked={notifyData?.where_notify === "ส่วนตัว"}
                 />
               )}
             </Group2>
@@ -394,7 +431,7 @@ export default function Notify() {
               className="d-flex align-items-center notify-type notify-group type"
               margin="0 0 0 180px"
             >
-              {notifyData.where_notify === "งาน" && (
+              {notifyData?.where_notify === "งาน" && (
                 <Select
                   className="notify-select"
                   title="งาน"
@@ -408,7 +445,7 @@ export default function Notify() {
                   })}
                   style={"2"}
                   name="where_detail"
-                  value={notifyData.where_detail}
+                  value={notifyData?.where_detail}
                   errorMsg={check?.where_detail}
                   onChange={onChangeText}
                   required
@@ -424,7 +461,7 @@ export default function Notify() {
               placeholder={"อาการที่พบเจอเบื่องต้นหรือหมายเหตุเพิ่มเติม."}
               style={"3"}
               name="note"
-              value={notifyData.note}
+              value={notifyData?.note}
               onChange={onChangeText}
             />
             <Group2
@@ -440,7 +477,7 @@ export default function Notify() {
                 radioClick={() =>
                   setNotifyData({ ...notifyData, urgent: "ไม่ด่วน" })
                 }
-                defaultChecked={true}
+                defaultChecked={notifyData?.urgent === "ไม่ด่วน"}
               />
               <Input
                 style={"4"}
@@ -451,6 +488,7 @@ export default function Notify() {
                 radioClick={() =>
                   setNotifyData({ ...notifyData, urgent: "ด่วน" })
                 }
+                defaultChecked={notifyData?.urgent === "ด่วน"}
               />
             </Group2>
             {check?.urgent && (
@@ -470,18 +508,18 @@ export default function Notify() {
                 ยกเลิก
               </Button>
               <Button bgc="#28a745" margin="0 0 0 auto" onClick={checkData}>
-                ขอรับบริการ
+                แก้ไข
               </Button>
             </Group>
           </form>
         </Contents>
-      </StyleExtendsSection>
-      <LoadingPage loading={loading} />
+      </Style>
+      <LoadingPage loading={loading2} />
     </>
   );
 }
 
-const StyleExtendsSection = styled(Section)`
+const Style = styled.div`
   label: notify-form;
 
   .notify-breadcrumbs {
