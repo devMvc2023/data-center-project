@@ -263,13 +263,22 @@ export default function RehearsalDetail({
         }
         tagButtons={
           <>
+            <Button
+              type="button"
+              margin="0 10px 0 0"
+              width="60px"
+              bgc="var(--gray-1)"
+              onClick={onClose}
+            >
+              ปิด
+            </Button>
             {dataDetail?.status === "รอคิว" && profile && (
               <>
                 {profile?.data_id === dataDetail?.user_id && (
-                  <div className="d-flex">
+                  <EditButton>
                     <Button
                       type="button"
-                      margin="0 10px 0 auto"
+                      margin="0 10px 0 0"
                       width="60px"
                       bgc="#ff0000"
                       onClick={onDeleteData}
@@ -278,14 +287,14 @@ export default function RehearsalDetail({
                     </Button>
                     <Button
                       type="button"
-                      margin="0 0 0 auto"
+                      margin="0 0 0 0"
                       width="60px"
                       bgc="#0d6efd"
                       onClick={onEdit}
                     >
                       แก้ไข
                     </Button>
-                  </div>
+                  </EditButton>
                 )}
                 {profile?.role !== "member" && (
                   <Button
@@ -325,48 +334,53 @@ export default function RehearsalDetail({
                 </>
               )}
 
-            {dataDetail?.status === "ปิดงาน" &&
-              profile &&
-              (profile?.data_id === dataDetail?.user_id ||
-                profile?.role !== "member") && (
-                <CustomButton
-                  type="button"
-                  bgc="var(--red-2)"
-                  width={"11rem"}
-                  className="custom-button"
-                >
-                  <PDFDownloadLink
-                    document={<NotifyReport notifyData={dataDetail} />}
-                    fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
-                  >
-                    {({ blob, url, loading, error }) =>
-                      loading ? (
-                        <>
-                          <i className="fas fa-tools mx-1"></i> กำลังโหลดไฟล์
-                        </>
-                      ) : (
-                        <>
-                          <i className="fas fa-tools mx-1"></i>{" "}
-                          พิมใบการปฎิบัติงาน
-                        </>
-                      )
-                    }
-                  </PDFDownloadLink>
-                </CustomButton>
-              )}
+            {dataDetail?.status === "ปิดงาน" && (
+              <EditButton2>
+                {profile &&
+                  (profile?.data_id === dataDetail?.user_id ||
+                    profile?.role !== "member") && (
+                    <>
+                      <CustomButton
+                        type="button"
+                        bgc="var(--red-2)"
+                        width={"11rem"}
+                        className="custom-button"
+                        margin="0 10px 0 0"
+                      >
+                        <PDFDownloadLink
+                          document={<NotifyReport notifyData={dataDetail} />}
+                          fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
+                        >
+                          {({ blob, url, loading, error }) =>
+                            loading ? (
+                              <>
+                                <i className="fas fa-tools mx-1"></i>{" "}
+                                กำลังโหลดไฟล์
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-tools mx-1"></i>{" "}
+                                พิมใบการปฎิบัติงาน
+                              </>
+                            )
+                          }
+                        </PDFDownloadLink>
+                      </CustomButton>
+                    </>
+                  )}
 
-            {dataDetail?.status === "ปิดงาน" &&
-              profile &&
-              profile?.data_id === dataDetail.user_id && (
-                <Button
-                  type="button"
-                  bgc="var(--red-7)"
-                  width={"10rem"}
-                  onClick={() => setRating({ open: true })}
-                >
-                  ให้คะแนน
-                </Button>
-              )}
+                {profile && profile?.data_id === dataDetail.user_id && (
+                  <Button
+                    type="button"
+                    bgc="var(--red-7)"
+                    width={"10rem"}
+                    onClick={() => setRating({ open: true })}
+                  >
+                    ให้คะแนน
+                  </Button>
+                )}
+              </EditButton2>
+            )}
           </>
         }
         open={open}
@@ -685,4 +699,18 @@ const CustomButton = styled(Button)`
     color: #ffffff;
     text-decoration: none;
   }
+`;
+
+const EditButton = styled.div`
+  label: edit-button;
+
+  display: flex;
+  margin-right: auto;
+`;
+
+const EditButton2 = styled.div`
+  label: edit-button;
+
+  display: flex;
+  margin-left: auto;
 `;

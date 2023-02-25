@@ -59,7 +59,6 @@ export default function Rehersal() {
 
   useEffect(() => {
     const getData = async () => {
-      setLoading(false);
       if (filterData.length === 0) setLoading2(true);
 
       const notify = await GetAll("notify_data");

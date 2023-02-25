@@ -503,12 +503,12 @@ export default function EditNotify({ data, onCloseEdit = () => null }) {
                 bgc="#dc3545"
                 width="80px"
                 margin="0 auto 0 0"
-                onClick={() => navigate("/rehearsal")}
+                onClick={onCloseEdit}
               >
                 ยกเลิก
               </Button>
               <Button bgc="#28a745" margin="0 0 0 auto" onClick={checkData}>
-                แก้ไข
+                ตกลง
               </Button>
             </Group>
           </form>
