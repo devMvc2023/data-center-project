@@ -11,7 +11,6 @@ import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
 import { GetAll, UPDATE } from "api";
 import { PopupJs } from "component/common/popup";
-import { useNavigate } from "react-router-dom";
 import { breakpoint, storage } from "component/common/util";
 import { deleteObject, ref, uploadBytes } from "firebase/storage";
 import LoadingPage from "component/element/loading";
@@ -26,8 +25,6 @@ export default function EditNotify({ data, onCloseEdit = () => null }) {
   const [deleteimage, setDeleteimage] = useState([]);
   const [loading2, setLoading2] = useState(false);
   const { profile, setLoading } = useProfile();
-
-  const navigate = useNavigate();
 
   const checkData = (event) => {
     event.preventDefault();
@@ -125,6 +122,8 @@ export default function EditNotify({ data, onCloseEdit = () => null }) {
     };
 
     try {
+      console.log("log >> file: edit-notify.js:126 >> onNotify >> data:", data);
+
       const res = await UPDATE("notify_data", data, notifyData?.data_id);
 
       if (res === "update success!") {

@@ -6,7 +6,19 @@ const ProfileConsumer = ProfileContext.Consumer;
 
 function ProfileProvider({ children }) {
   const [profile, setProfile] = useState(null);
-  const [editProfile, setEditProfile] = useState(null);
+  const [editProfile, setEditProfile] = useState({
+    title: "",
+    first_name: "",
+    last_name: "",
+    user_name: "",
+    password: "",
+    email: "",
+    allow_work: false,
+    identity_id: "",
+    phone: "",
+    role: "",
+    user_faction: [],
+  });
   const [changePassPath, setChangePassPath] = useState("");
   const [loading, setLoading] = useState(false);
 

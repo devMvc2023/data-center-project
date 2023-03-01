@@ -33,6 +33,15 @@ export default function NavMenu() {
         <i className="fas fa-chart-bar" />
         สถิติการบริการ
       </Link>
+      <Link
+        to="public-relations"
+        className={`nav-menu ${
+          pathname === "/public-relations" ? "active" : ""
+        }`}
+      >
+        <i className="fas fa-bullhorn" />
+        ประชาสัมพันธ์
+      </Link>
       {!profile?.data_id && (
         <Link
           to="organizing-team"

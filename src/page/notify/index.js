@@ -42,6 +42,17 @@ export default function Notify() {
   const checkData = (event) => {
     event.preventDefault();
 
+    let since_date = true;
+    let up_date = true;
+    let image = false;
+
+    if (notifyData?.images?.length > 0) image = notifyData?.images?.length > 4;
+
+    if (notifyData?.repairs_list === "ประชาสัมพันธ์ข่าวสาร") {
+      since_date = notifyData?.since_date ? true : false;
+      up_date = notifyData?.up_date ? true : false;
+    }
+
     setCheck({
       where_notify:
         profile?.user_faction?.every(
@@ -52,14 +63,18 @@ export default function Notify() {
       repairs_list: !notifyData?.repairs_list && "เลือกบริการ",
       symptom: symptom.length === 0 && "เลือกสิ่งที่ต้องการ",
       urgent: !notifyData?.urgent && "เลือกความด่วน",
+      since_date: !since_date && "เลือกระยะเวลา",
+      up_date: !up_date && "เลือกระยะเวลา",
+      image: image && "รูปภาพต้องน้อยกว่าหรือเท่ากับ 4 รูปเท่านั้น",
     });
-    console.log("log >> file: index.js:29 >> Notify >> check", check);
 
     if (
       !check?.where_notify &&
       !check?.repairs_list &&
       !check?.symptom &&
       !check?.urgent &&
+      !check?.since_date &&
+      !check?.up_date &&
       (profile?.user_faction?.every(
         (data) => data?.position_name !== "นักศึกษา"
       )
@@ -67,7 +82,10 @@ export default function Notify() {
         : notifyData) &&
       notifyData?.repairs_list &&
       symptom.length > 0 &&
-      notifyData?.urgent
+      notifyData?.urgent &&
+      since_date &&
+      up_date &&
+      !image
     ) {
       onNotify();
     }
@@ -79,8 +97,14 @@ export default function Notify() {
     const repairs_id = repairs?.filter(
       (d) => d.name === notifyData?.repairs_list
     )[0].data_id;
-
     const currentSymptom = symptom.filter((sym) => sym !== undefined);
+    let since_date = "";
+    let up_date = "";
+
+    if (notifyData?.since_date) {
+      since_date = new Date(notifyData?.since_date);
+      up_date = new Date(notifyData?.up_date);
+    }
 
     let where = notifyData?.where_detail;
     if (notifyData?.where_notify === "ภาควิชา") {
@@ -124,6 +148,8 @@ export default function Notify() {
       urgent: notifyData.urgent,
       images: nameUrl,
       status: "รอคิว",
+      since_date: since_date,
+      up_date: up_date,
     };
 
     try {
@@ -186,7 +212,7 @@ export default function Notify() {
   const deleteFile = (event) => {
     const d = notifyData.images.filter((item, index) => index !== event);
 
-    setNotifyData({ ...notifyData, image: d });
+    setNotifyData({ ...notifyData, images: d });
   };
 
   useEffect(() => {
@@ -287,6 +313,39 @@ export default function Notify() {
                 onChange={onChangeText}
               />
             )}
+            {notifyData.repairs_list === "ประชาสัมพันธ์ข่าวสาร" && (
+              <Group2 className="notify-group">
+                <Input
+                  className="notify-input"
+                  title="ตั้งแต่วันที่"
+                  margin="20px 20px 0 0"
+                  inputWidth="200px"
+                  height="34px"
+                  style={"2"}
+                  width="fit-content"
+                  name="since_date"
+                  type={"datetime-local"}
+                  value={notifyData.location}
+                  onChange={onChangeText}
+                  errorMsg={check?.since_date}
+                />
+                <Input
+                  className="notify-input"
+                  title="ถึงวันที่"
+                  margin="20px 0 0 0"
+                  inputWidth="200px"
+                  titleWidth="60px"
+                  height="34px"
+                  style={"2"}
+                  name="up_date"
+                  width="fit-content"
+                  type={"datetime-local"}
+                  value={notifyData.location}
+                  onChange={onChangeText}
+                  errorMsg={check?.up_date}
+                />
+              </Group2>
+            )}
             <hr />
             <Group2 className="group-image notify-group">
               <label className="image-title">ภาพประกอบ</label>
@@ -325,6 +384,11 @@ export default function Notify() {
                 </div>
               )}
             </Group2>
+            {check?.image && (
+              <Group2 className="err-margin notify-group" margin="0 0 0 180px">
+                <div className="err-message text-danger">{check?.image}</div>
+              </Group2>
+            )}
             {preview && (
               <PopupJs.jsx
                 open={preview && true}

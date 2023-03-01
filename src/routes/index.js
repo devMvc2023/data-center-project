@@ -6,6 +6,7 @@ import Demo from "page/demo";
 import Member from "page/member";
 import Notify from "page/notify";
 import { OTPpassword, ChangePassword, ComparePassword } from "page/password";
+import PublicRelations from "page/public-relations";
 import Rehersal from "page/rehearsal";
 import Settings from "page/settings";
 import Statistics from "page/statistics";
@@ -59,6 +60,8 @@ function Router() {
           <Route path="/rehearsal" index element={<Rehersal />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/organizing-team" element={<Team />} />
+          <Route path="/public-relations" element={<PublicRelations />} />
+
           {profile?.data_id ? (
             <>
               {profile?.data_id && profile?.role !== "member" ? (

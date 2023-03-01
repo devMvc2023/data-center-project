@@ -182,7 +182,7 @@ export default function Member() {
                     <Button
                       padding="0"
                       fontSize="14px"
-                      height="25px"
+                      height="30px"
                       width="60px"
                       bgc={"#0d6efd"}
                       onClick={() => onEditUser(data)}
@@ -225,6 +225,17 @@ export default function Member() {
                   <EditButton>
                     <Button
                       fontSize="16px"
+                      width={"100px"}
+                      height="30px"
+                      margin="0 10px 0 0"
+                      onClick={() =>
+                        setConfilm({ open: true, id: dataDetail2?.data_id })
+                      }
+                    >
+                      ลบสมาชิก
+                    </Button>
+                    <Button
+                      fontSize="16px"
                       height="30px"
                       width="70px"
                       bgc={"#0d6efd"}
@@ -238,23 +249,11 @@ export default function Member() {
                     >
                       อัปเดต
                     </Button>
-                    <Button
-                      fontSize="16px"
-                      width={"100px"}
-                      height="30px"
-                      margin="0 0 0 20px"
-                      onClick={() =>
-                        setConfilm({ open: true, id: dataDetail2?.data_id })
-                      }
-                    >
-                      ลบสมาชิก
-                    </Button>
                   </EditButton>
                 }
               >
                 <Input
                   value={dataDetail2?.user_name}
-                  defaultValue={dataDetail2?.user_name}
                   onChange={(event) =>
                     setDataDetail2({
                       ...dataDetail2,
@@ -270,7 +269,7 @@ export default function Member() {
                   errorMsg={check?.user_name}
                 />
                 <Input
-                  value={dataDetail2?.password}
+                  value={confilmPass?.pass}
                   onChange={(event) =>
                     setConfilmPass({
                       ...confilmPass,
@@ -284,7 +283,7 @@ export default function Member() {
                   errorMsg={check?.pass}
                 />
                 <Input
-                  value={confilmPass}
+                  value={confilmPass?.conPass}
                   onChange={(event) =>
                     setConfilmPass({
                       ...confilmPass,

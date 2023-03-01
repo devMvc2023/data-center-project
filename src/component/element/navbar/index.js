@@ -44,7 +44,7 @@ const Style = styled.div`
     width: 100%;
 
     .navbar-menu {
-      ${breakpoint(1072)} {
+      ${breakpoint("XL")} {
         display: none;
       }
     }
@@ -52,12 +52,12 @@ const Style = styled.div`
     .navbar-login {
       margin-left: auto;
 
-      ${breakpoint(1072)} {
+      ${breakpoint("XL")} {
         display: none;
       }
     }
 
-    ${breakpoint(1072)} {
+    ${breakpoint("XL")} {
       justify-content: center;
       padding: 0;
 
@@ -78,7 +78,7 @@ const Style = styled.div`
   .sideber {
     display: none;
 
-    ${breakpoint(1072)} {
+    ${breakpoint("XL")} {
       display: block;
     }
   }

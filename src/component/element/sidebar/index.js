@@ -99,6 +99,19 @@ function Sidebar({ ...props }) {
               </div>
               <div className="menu-title">สถิติการบริการ</div>
             </Link>
+            <Link
+              to="public-relations"
+              className={`sidebar-menu-item ${
+                pathname === "/public-relations" ? "active" : ""
+              }`}
+              onClick={() => setShow(false)}
+            >
+              <div className="menu-icon">
+                <i className="fas fa-bullhorn" />
+              </div>
+              <div className="menu-title">ประชาสัมพันธ์</div>
+            </Link>
+
             {!profile?.data_id && (
               <Link
                 to="organizing-team"

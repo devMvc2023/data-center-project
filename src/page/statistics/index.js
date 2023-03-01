@@ -28,7 +28,7 @@ ChartJS.register(
 );
 
 export default function Statistics() {
-  const [time, setTime] = useState("รายปี");
+  const [time, setTime] = useState("รายเดือน");
   const [dataInTime, setDataInTime] = useState([]);
   const [notifyData, setNotifyData] = useState([]);
   const [repairs, setRepairs] = useState([]);
@@ -36,6 +36,10 @@ export default function Statistics() {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState({ datasets: [] });
   const [chartOption, setChartOption] = useState();
+
+  const date = new Date();
+  const year = date.getFullYear() + 543 - 5;
+  const currentYear = date.getFullYear() + 543;
 
   const onChartData = (dataInti, path, timely) => {
     const dataSets = [];
@@ -85,7 +89,7 @@ export default function Statistics() {
         x: {
           title: {
             display: true,
-            text: timely,
+            text: `${timely} (ปี ${currentYear})`,
           },
         },
       },
@@ -94,10 +98,6 @@ export default function Statistics() {
 
   const onTimely = (time, dataT, path) => {
     let dataTime = [];
-
-    const date = new Date();
-    const year = date.getFullYear() + 543 - 5;
-    const currentYear = date.getFullYear() + 543;
 
     if (time === "รายปี") {
       const filData = dataT.filter((data) => data.notify_year > year);
@@ -150,7 +150,7 @@ export default function Statistics() {
       setNotifyData(data);
       setRepairs(repairs_list);
       setFilter("ทั้งหมด");
-      if (data && repairs_list) onTimely("รายปี", data, "ทั้งหมด");
+      if (data && repairs_list) onTimely("รายเดือน", data, "ทั้งหมด");
       setLoading(false);
     };
 
@@ -168,19 +168,19 @@ export default function Statistics() {
             <div className="bar-yearly">
               <div
                 className={`bar-menu ${
-                  time === "รายปี" ? "active" : "non-active"
-                }`}
-                onClick={() => onTimely("รายปี", notifyData, filter)}
-              >
-                รายปี
-              </div>
-              <div
-                className={`bar-menu ${
                   time === "รายเดือน" ? "active" : "non-active"
                 }`}
                 onClick={() => onTimely("รายเดือน", notifyData, filter)}
               >
                 รายเดือน
+              </div>
+              <div
+                className={`bar-menu ${
+                  time === "รายปี" ? "active" : "non-active"
+                }`}
+                onClick={() => onTimely("รายปี", notifyData, filter)}
+              >
+                รายปี
               </div>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function Statistics() {
               <thead>
                 <tr>
                   <td rowSpan="2" className="table-header1 table-border">
-                    {time === "รายปี" ? "ปี" : "เดือน"}
+                    {time === "รายปี" ? "ปี" : `เดือน (ปี ${currentYear})`}
                   </td>
                   <td rowSpan="2" className="table-header1 table-border">
                     รวม
@@ -280,7 +280,7 @@ export default function Statistics() {
             </table>
           </Contents>
           <Contents className="statistics-table-chart">
-            <div className="chart-title">สถิติการให้บริการ</div>
+            <div className="chart-title">สถิติการให้บริการปี {currentYear}</div>
             <Bar options={chartOption} data={chartData} />
           </Contents>
         </div>
@@ -367,7 +367,7 @@ const StyleExtendsSection = styled(Section)`
     }
 
     .table {
-      width: 1038px;
+      width: 100%;
 
       td {
         padding: 0.3rem;
@@ -388,24 +388,12 @@ const StyleExtendsSection = styled(Section)`
         background-color: #fdfdfe;
       }
 
-      ${breakpoint("LG")} {
-        width: 800px;
-      }
-
-      ${breakpoint("MD")} {
-        width: 700px;
-      }
-
-      ${breakpoint("XS")} {
-        width: 520px;
+      ${breakpoint(488)} {
+        width: 440px;
       }
     }
 
     ${breakpoint("XL")} {
-      max-width: 100%;
-    }
-
-    ${breakpoint("MD")} {
       max-width: 100%;
     }
   }

@@ -266,7 +266,6 @@ function SignupForm({ onSignup = () => null }) {
           selectPlace="-"
           title={"คำนำหน้า"}
           value={editProfile?.title}
-          defaultValue={editProfile?.title}
           onChange={onChangeText}
           errorMsg={check?.title}
           width="22%"
@@ -277,14 +276,12 @@ function SignupForm({ onSignup = () => null }) {
           title="ชื่อ"
           name="first_name"
           onChange={onChangeText}
-          defaultValue={editProfile?.first_name}
           width="38%"
           errorMsg={check?.first}
           required
         />
         <Input
           value={editProfile?.last_name}
-          defaultValue={editProfile?.last_name}
           title="นามสกุล"
           name="last_name"
           onChange={onChangeText}
@@ -584,7 +581,6 @@ function SignupForm({ onSignup = () => null }) {
         {location.pathname !== "/signup/student" && (
           <Input
             value={editProfile?.user_name}
-            defaultValue={editProfile?.user_name}
             title={"ชื่อผู้ใช้"}
             name="user_name"
             icon="fas fa-user"
@@ -599,7 +595,6 @@ function SignupForm({ onSignup = () => null }) {
         {location.pathname === "/signup/student" && (
           <Input
             value={editProfile?.user_name}
-            defaultValue={editProfile?.user_name}
             title={"รหัสนักศึกษา"}
             name="user_name"
             icon="fas fa-user"
@@ -613,7 +608,6 @@ function SignupForm({ onSignup = () => null }) {
         )}
         <Input
           value={editProfile?.identity_id}
-          defaultValue={editProfile?.identity_id}
           title="รหัสประจำตัวประชาชน"
           type={"number"}
           name="identity_id"
@@ -627,7 +621,6 @@ function SignupForm({ onSignup = () => null }) {
       <Group className="faction-group">
         <Input
           value={editProfile?.phone}
-          defaultValue={editProfile?.phone}
           title="เบอร์โทรศัพท์"
           name="phone"
           icon="fas fa-phone"
@@ -640,7 +633,6 @@ function SignupForm({ onSignup = () => null }) {
         />
         <Input
           value={editProfile?.email}
-          defaultValue={editProfile?.email}
           title="อีเมล"
           name="email"
           icon="fa fa-envelope"
@@ -656,7 +648,6 @@ function SignupForm({ onSignup = () => null }) {
         <Group className="faction-group">
           <Input
             value={editProfile?.line_id}
-            defaultValue={editProfile?.line_id}
             title="ไลน์ไอดี"
             icon="fab fa-line"
             iconSize="20px"

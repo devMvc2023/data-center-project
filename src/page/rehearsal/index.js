@@ -29,6 +29,8 @@ export default function Rehersal() {
 
   const { loading, setLoading } = useProfile();
 
+  const star = [1, 2, 3, 4, 5];
+
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const onFilter = (event) => {
@@ -74,7 +76,12 @@ export default function Rehersal() {
         });
         data.notify_time = notify_date.toLocaleTimeString("th-TH");
 
-        if (data.status === "กำลังดำเนินการ" || data.status === "ปิดงาน") {
+        if (
+          data.status === "กำลังดำเนินการ" ||
+          data.status === "ปิดงาน" ||
+          data.status === "ไม่อนุญาต" ||
+          data.status === "อนุญาต"
+        ) {
           const execution_date = new Date(data.execution_date.seconds * 1000);
 
           data.execution_date = execution_date.toLocaleDateString("th-TH", {
@@ -83,7 +90,11 @@ export default function Rehersal() {
           data.execution_time = execution_date.toLocaleTimeString("th-TH");
         }
 
-        if (data.status === "ปิดงาน") {
+        if (
+          data.status === "ปิดงาน" ||
+          data.status === "ไม่อนุญาต" ||
+          data.status === "อนุญาต"
+        ) {
           const finish_date = new Date(data.finish_date.seconds * 1000);
 
           data.finish_date = finish_date.toLocaleDateString("th-TH", {
@@ -96,7 +107,11 @@ export default function Rehersal() {
       setNotifyData(notifyData);
       setFilterData(notifyData);
       setUserData(user);
-      if (filterData.length === 0) setLoading2(false);
+      setLoading(false);
+
+      if (filterData.length === 0) {
+        setLoading2(false);
+      }
     };
 
     getData();
@@ -135,22 +150,32 @@ export default function Rehersal() {
                   "ผู้ดำเนินการ",
                   "สถานะ",
                   "รายละเอียด",
+                  "คะแนน",
                 ]}
                 td={currentData?.map((data, index) => (
                   <React.Fragment key={index}>
                     <tr
                       className={`body ${
-                        data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                        data.urgent === "ด่วน" &&
+                        data.status !== "ปิดงาน" &&
+                        data.status !== "ไม่อนุญาต" &&
+                        data.status !== "อนุญาต"
                           ? "text-info"
                           : ""
                       }
               ${
-                data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
+                data.urgent === "ด่วนมาก" &&
+                data.status !== "ปิดงาน" &&
+                data.status !== "ไม่อนุญาต" &&
+                data.status !== "อนุญาต"
                   ? "text-warning"
                   : ""
               }
               ${
-                data.urgent === "ด่วนมากที่สุด" && data.status !== "ปิดงาน"
+                data.urgent === "ด่วนมากที่สุด" &&
+                data.status !== "ปิดงาน" &&
+                data.status !== "ไม่อนุญาต" &&
+                data.status !== "อนุญาต"
                   ? "text-danger"
                   : ""
               }`}
@@ -174,7 +199,9 @@ export default function Rehersal() {
                           textColor
                         )}`}
                       >
-                        {data.status}
+                        {data.status === "อนุญาต" || data.status === "ไม่อนุญาต"
+                          ? "ปิดงาน"
+                          : data.status}
                       </td>
                       <td className="detail">
                         <Button
@@ -186,6 +213,18 @@ export default function Rehersal() {
                         >
                           ดูรายละเอียด
                         </Button>
+                      </td>
+                      <td className="rehearsal-star">
+                        {star.map((star, index) => {
+                          return (
+                            <i
+                              className={`${
+                                data?.rating >= star ? "fas" : "far"
+                              } fa-star `}
+                              key={index}
+                            />
+                          );
+                        })}
                       </td>
                     </tr>
                   </React.Fragment>
@@ -264,9 +303,15 @@ const StyleExtendsSection = styled(Section)`
   .table-body {
     min-height: 470px;
     .table {
-      ${breakpoint(1020)} {
-        width: 900px;
+      ${breakpoint(1160)} {
+        width: 1200px;
       }
     }
+  }
+
+  .rehearsal-star {
+    font-size: 14px;
+    color: rgb(212, 180, 0);
+    text-align: center;
   }
 `;

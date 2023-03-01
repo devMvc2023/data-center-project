@@ -19,6 +19,10 @@ const repairs_icon = [
     title: "ระบบ RMS",
     detail: "fas fa-print",
   },
+  {
+    title: "ประชาสัมพันธ์ข่าวสาร",
+    detail: "fas fa-bullhorn",
+  },
 ];
 
 const textColor = [

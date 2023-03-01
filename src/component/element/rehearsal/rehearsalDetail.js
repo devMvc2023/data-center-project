@@ -2,7 +2,7 @@ import { DELETE, GetAll, UPDATE } from "api";
 import { Button } from "component/common/page-layout/page-layout";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
-import { FindData } from "component/common/util";
+import { FindData, storage } from "component/common/util";
 import { PopupJs } from "component/common/popup";
 import { repairs_icon } from "array-data/repairs_icon";
 import styled from "@emotion/styled";
@@ -11,6 +11,7 @@ import NotifyReport from "../notify-report";
 import { Select } from "component/common/form";
 import LoadingPage from "../loading";
 import emailjs from "@emailjs/browser";
+import { deleteObject, ref } from "firebase/storage";
 
 export default function RehearsalDetail({
   data,
@@ -27,6 +28,10 @@ export default function RehearsalDetail({
   const [rating, setRating] = useState({ open: false });
   const [urgent, setUrgent] = useState();
   const [contractor, setContractor] = useState(data?.contractor);
+  const [confilm, setConfilm] = useState({
+    open: false,
+  });
+
   const { profile, loading, setLoading } = useProfile();
 
   const star = [1, 2, 3, 4, 5];
@@ -48,7 +53,11 @@ export default function RehearsalDetail({
     const date = new Date();
     let dataUpdata = {};
 
-    if (dataDetail.status === "รอคิว")
+    if (
+      dataDetail.status === "รอคิว" &&
+      status !== "ไม่อนุญาต" &&
+      status !== "อนุญาต"
+    )
       dataUpdata = {
         status: "กำลังดำเนินการ",
         contractor: `${profile.title}${profile.first_name} ${profile.last_name}`,
@@ -56,9 +65,23 @@ export default function RehearsalDetail({
         execution_date: date,
       };
 
-    if (dataDetail.status === "กำลังดำเนินการ")
+    if (
+      dataDetail.status === "กำลังดำเนินการ" &&
+      status !== "ไม่อนุญาต" &&
+      status !== "อนุญาต"
+    )
       dataUpdata = {
         status: status,
+        finish_date: date,
+        finish_note: dataDetail.finish_note || "",
+      };
+
+    if (status === "ไม่อนุญาต" || status === "อนุญาต")
+      dataUpdata = {
+        status: status,
+        contractor: `${profile.title}${profile.first_name} ${profile.last_name}`,
+        contractor_id: profile.data_id,
+        execution_date: date,
         finish_date: date,
         finish_note: dataDetail.finish_note || "",
       };
@@ -133,8 +156,17 @@ export default function RehearsalDetail({
     try {
       const res = await DELETE("notify_data", dataDetail?.data_id);
 
+      if (dataDetail?.images > 0) {
+        dataDetail?.images?.map((image) => {
+          const imageRef = ref(storage, `notify_images/${image}`);
+
+          deleteObject(imageRef);
+        });
+      }
+
       if (res === "delete success!") {
         setLoading(true);
+        setConfilm({ open: false });
         onClose();
       }
     } catch (error) {
@@ -265,7 +297,7 @@ export default function RehearsalDetail({
           <>
             <Button
               type="button"
-              margin="0 10px 0 0"
+              margin="0 10px 0 auto"
               width="60px"
               bgc="var(--gray-1)"
               onClick={onClose}
@@ -275,13 +307,17 @@ export default function RehearsalDetail({
             {dataDetail?.status === "รอคิว" && profile && (
               <>
                 {profile?.data_id === dataDetail?.user_id && (
-                  <EditButton>
+                  <div className="d-flex">
                     <Button
                       type="button"
                       margin="0 10px 0 0"
                       width="60px"
                       bgc="#ff0000"
-                      onClick={onDeleteData}
+                      onClick={() =>
+                        setConfilm({
+                          open: true,
+                        })
+                      }
                     >
                       ลบ
                     </Button>
@@ -294,18 +330,43 @@ export default function RehearsalDetail({
                     >
                       แก้ไข
                     </Button>
-                  </EditButton>
+                  </div>
                 )}
-                {profile?.role !== "member" && (
-                  <Button
-                    type="button"
-                    onClick={() => onUpdateData("กำลังดำเนินการ")}
-                    margin="0 20px 0 auto"
-                    bgc="var(--green-1)"
-                  >
-                    รับงาน
-                  </Button>
-                )}
+                {dataDetail?.repairs_list !== "ประชาสัมพันธ์ข่าวสาร" &&
+                  profile?.role !== "member" && (
+                    <Button
+                      type="button"
+                      onClick={() => onUpdateData("กำลังดำเนินการ")}
+                      margin="0 0 0 10px"
+                      bgc="var(--green-1)"
+                      width="4rem"
+                    >
+                      รับงาน
+                    </Button>
+                  )}
+                {dataDetail?.repairs_list === "ประชาสัมพันธ์ข่าวสาร" &&
+                  profile?.role !== "member" && (
+                    <>
+                      <Button
+                        type="button"
+                        onClick={() => onUpdateData("ไม่อนุญาต")}
+                        margin="0 0 0 10px"
+                        bgc="var(--red-1)"
+                        width="6rem"
+                      >
+                        ไม่อนุญาต
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => onUpdateData("อนุญาต")}
+                        margin="0 0 0 10px"
+                        bgc="var(--green-1)"
+                        width="4rem"
+                      >
+                        อนุญาต
+                      </Button>
+                    </>
+                  )}
               </>
             )}
 
@@ -326,16 +387,19 @@ export default function RehearsalDetail({
                   <Button
                     type="button"
                     onClick={() => onUpdateData("ปิดงาน")}
-                    margin="0 20px 0 auto"
+                    margin="0 0 0 0"
                     bgc="var(--green-6)"
+                    width="5rem"
                   >
                     ปิดงาน
                   </Button>
                 </>
               )}
 
-            {dataDetail?.status === "ปิดงาน" && (
-              <EditButton2>
+            {(dataDetail?.status === "ปิดงาน" ||
+              dataDetail?.status === "อนุญาต" ||
+              dataDetail?.status === "ไม่อนุญาต") && (
+              <div className="d-flex">
                 {profile &&
                   (profile?.data_id === dataDetail?.user_id ||
                     profile?.role !== "member") && (
@@ -373,13 +437,14 @@ export default function RehearsalDetail({
                   <Button
                     type="button"
                     bgc="var(--red-7)"
-                    width={"10rem"}
+                    width={"6rem"}
                     onClick={() => setRating({ open: true })}
+                    margin="0 auto 0 0"
                   >
                     ให้คะแนน
                   </Button>
                 )}
-              </EditButton2>
+              </div>
             )}
           </>
         }
@@ -572,7 +637,12 @@ export default function RehearsalDetail({
               </tr>
               <tr>
                 <th>สถานะการดำเนินการ</th>
-                <td>{dataDetail?.status}</td>
+                <td>
+                  {dataDetail?.status === "ไม่อนุญาต" ||
+                  dataDetail?.status === "อนุญาต"
+                    ? `${dataDetail?.status} (ปิดงาน)`
+                    : dataDetail?.status}
+                </td>
               </tr>
               <tr>
                 <th>หมายเหตุ</th>
@@ -668,6 +738,38 @@ export default function RehearsalDetail({
           />
         </Rating>
       </PopupJs.jsx>
+      {confilm.open && (
+        <PopupJs.jsx
+          title={<div className="text-center">ยืนยันการลบข้อมูล</div>}
+          open={confilm.open && true}
+          onClose={() => setConfilm({ open: false })}
+          maxWidth="300px"
+          tagButtons={
+            <>
+              <Button
+                type="button"
+                margin="0 auto 0 20px"
+                bgc="var(--red-7)"
+                onClick={() =>
+                  setConfilm({
+                    open: false,
+                  })
+                }
+              >
+                ยกเลิก
+              </Button>
+              <Button
+                type="button"
+                margin="0 20px 0 auto"
+                bgc="#28a745"
+                onClick={onDeleteData}
+              >
+                ยืนยัน
+              </Button>
+            </>
+          }
+        ></PopupJs.jsx>
+      )}
     </>
   );
 }
@@ -699,18 +801,4 @@ const CustomButton = styled(Button)`
     color: #ffffff;
     text-decoration: none;
   }
-`;
-
-const EditButton = styled.div`
-  label: edit-button;
-
-  display: flex;
-  margin-right: auto;
-`;
-
-const EditButton2 = styled.div`
-  label: edit-button;
-
-  display: flex;
-  margin-left: auto;
 `;

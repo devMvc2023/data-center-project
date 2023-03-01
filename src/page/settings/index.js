@@ -290,7 +290,7 @@ function Settings() {
             </Contents>
             {confilm.open && (
               <PopupJs.jsx
-                title={<div className="text-center">คุณต้องการลบข้อมูลไหม</div>}
+                title={<div className="text-center">ยืนยันการลบข้อมูล</div>}
                 open={confilm.open && true}
                 onClose={() =>
                   setConfilm({ open: false, index: null, data: [], path: "" })
@@ -319,7 +319,7 @@ function Settings() {
                       bgc="#28a745"
                       onClick={onDeleteDatabase}
                     >
-                      ตกลง
+                      ยืนยัน
                     </Button>
                   </>
                 }
