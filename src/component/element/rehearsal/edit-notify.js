@@ -296,17 +296,16 @@ export default function EditNotify({ data, onCloseEdit = () => null }) {
             <Group2 className="group-image notify-group">
               <label className="image-title">ภาพประกอบ</label>
 
-              {notifyData?.images?.length === 0 && (
-                <FileUpload
-                  radius="none"
-                  className="file-upload"
-                  icon="fas fa-image"
-                  accept="image/*"
-                  disabled={notifyData?.images?.length === 10}
-                  onChange={onUpload}
-                  plusIcon={true}
-                />
-              )}
+              <FileUpload
+                radius="none"
+                className="file-upload"
+                icon="fas fa-image"
+                accept="image/*"
+                disabled={notifyData?.images?.length === 10}
+                onChange={onUpload}
+                plusIcon={true}
+              />
+
               {notifyData?.images?.length > 0 && (
                 <div className="image-group">
                   {notifyData?.images?.map((image, index) => {
@@ -561,7 +560,7 @@ const Style = styled.div`
       position: relative;
       display: flex;
       flex-direction: row;
-      margin: 10px 10px 0 0;
+      margin: 0 10px 10px 0;
       width: 106px;
       height: 106px;
 
@@ -599,11 +598,16 @@ const Style = styled.div`
       flex-wrap: wrap;
     }
 
+    .file-upload {
+      margin-right: 10px;
+    }
+
     ${breakpoint("XS")} {
       flex-direction: column;
       margin: 20px 0 0 0;
 
       .file-upload {
+        margin-bottom: 10px;
         width: fit-content;
       }
     }

@@ -65,10 +65,10 @@ export default function OTPpassword() {
 
     emailjs
       .send(
-        "service_ubpy3m4",
-        "template_yawd2hy",
+        "service_5sy3iwq",
+        "template_eif6peq",
         email_message,
-        "LXXEqL7ARI5DX2cXO"
+        "k6GJNXlcf6z8Qb_VG"
       )
       .then(
         (result) => {

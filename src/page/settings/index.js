@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { async } from "@firebase/util";
 import { DELETE, GetAll, GetOne, POST, UPDATE } from "api";
 import Breadcrumbs from "component/common/breadcrumbs";
+import CollapseComplete from "component/common/collapse";
 import { Input } from "component/common/form";
 import {
   Button,
@@ -31,6 +32,7 @@ function Settings() {
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [path, setPath] = useState();
+  const [link, setLink] = useState();
 
   const onUpdateData = async () => {
     setLoading(true);
@@ -58,6 +60,24 @@ function Settings() {
       }
     } catch (error) {
       console.log("log >> file: index.js:30 >> onUpdateData >> error", error);
+    }
+  };
+
+  const onUpdateLink = async () => {
+    setLoading(true);
+
+    const data = { link: link.link };
+
+    console.log("log >> file: index.js:71 >> onUpdateLink >> link:", link);
+    try {
+      const res = await UPDATE("Manual", data, link.data_id);
+
+      if (res === "update success!") {
+        setLoading2(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("log >> file: index.js:70 >> onUpdateLink >> error:", error);
     }
   };
 
@@ -133,12 +153,14 @@ function Settings() {
       const position = await GetAll("position");
       const repairs = await GetAll("repairs_list");
       const title = await GetAll("title");
+      const manual = await GetAll("Manual");
 
       setFaction(faction.sort((a, b) => a.id - b.id));
       setSubject(subject.sort((a, b) => a.id - b.id));
       setRepairs(repairs.sort((a, b) => a.id - b.id));
       setTitle(title.sort((a, b) => a.id - b.id));
       setPosition(position.sort((a, b) => a.id - b.id));
+      setLink(manual[0]);
       setLoading(false);
     };
 
@@ -285,6 +307,32 @@ function Settings() {
                       })
                     }
                   />
+                </div>
+                <div className="settings-table">
+                  <CollapseComplete title={"คู่มือการใช้งาน"} padding="16px">
+                    <div className="d-flex">
+                      <Input
+                        title="ลิ้งคู่มือการใช้งาน"
+                        margin="0 0 0 0"
+                        inputWidth="100%"
+                        height="fit-content"
+                        name="link"
+                        value={link?.link}
+                        onChange={(event) =>
+                          setLink({ ...link, link: event.target.value })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        margin="22px 0 0 5px"
+                        width="60px"
+                        height="34.6px"
+                        onClick={onUpdateLink}
+                      >
+                        ตกลง
+                      </Button>
+                    </div>
+                  </CollapseComplete>
                 </div>
               </Group>
             </Contents>

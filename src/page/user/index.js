@@ -99,7 +99,12 @@ export default function User() {
         });
         data.notify_time = notify_date.toLocaleTimeString("th-TH");
 
-        if (data.status === "กำลังดำเนินการ" || data.status === "ปิดงาน") {
+        if (
+          data.status === "กำลังดำเนินการ" ||
+          data.status === "ปิดงาน" ||
+          data.status === "ไม่อนุญาต" ||
+          data.status === "อนุญาต"
+        ) {
           const execution_date = new Date(data.execution_date.seconds * 1000);
 
           data.execution_date = execution_date.toLocaleDateString("th-TH", {
@@ -108,7 +113,11 @@ export default function User() {
           data.execution_time = execution_date.toLocaleTimeString("th-TH");
         }
 
-        if (data.status === "ปิดงาน") {
+        if (
+          data.status === "ปิดงาน" ||
+          data.status === "ไม่อนุญาต" ||
+          data.status === "อนุญาต"
+        ) {
           const finish_date = new Date(data.finish_date.seconds * 1000);
 
           data.finish_date = finish_date.toLocaleDateString("th-TH", {
@@ -132,7 +141,8 @@ export default function User() {
       const myNotifyWork = SortData(notifyWork);
 
       setNotifyWork(myNotifyWork);
-      setFilterData(notifyData);
+      setFilterData(myNotify);
+      setFilterData2(myNotifyWork);
       setUserData(user);
       if (filterData.length === 0) setLoading2(false);
     };
@@ -195,17 +205,26 @@ export default function User() {
                     td={currentData?.map((data, index) => (
                       <tr
                         className={`body ${
-                          data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                          data.urgent === "ด่วน" &&
+                          data.status !== "ปิดงาน" &&
+                          data.status !== "ไม่อนุญาต" &&
+                          data.status !== "อนุญาต"
                             ? "text-info"
                             : ""
                         }
                   ${
-                    data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
+                    data.urgent === "ด่วนมาก" &&
+                    data.status !== "ปิดงาน" &&
+                    data.status !== "ไม่อนุญาต" &&
+                    data.status !== "อนุญาต"
                       ? "text-warning"
                       : ""
                   }
                   ${
-                    data.urgent === "ด่วนมากที่สุด" && data.status !== "ปิดงาน"
+                    data.urgent === "ด่วนมากที่สุด" &&
+                    data.status !== "ปิดงาน" &&
+                    data.status !== "ไม่อนุญาต" &&
+                    data.status !== "อนุญาต"
                       ? "text-danger"
                       : ""
                   }`}
@@ -230,7 +249,10 @@ export default function User() {
                             textColor
                           )}`}
                         >
-                          {data.status}
+                          {data.status === "อนุญาต" ||
+                          data.status === "ไม่อนุญาต"
+                            ? "ปิดงาน"
+                            : data.status}
                         </td>
                         <td className="detail">
                           <Button
@@ -293,17 +315,26 @@ export default function User() {
                     td={currentWork?.map((data, index) => (
                       <tr
                         className={`body ${
-                          data.urgent === "ด่วน" && data.status !== "ปิดงาน"
+                          data.urgent === "ด่วน" &&
+                          data.status !== "ปิดงาน" &&
+                          data.status !== "ไม่อนุญาต" &&
+                          data.status !== "อนุญาต"
                             ? "text-info"
                             : ""
                         }
                   ${
-                    data.urgent === "ด่วนมาก" && data.status !== "ปิดงาน"
+                    data.urgent === "ด่วนมาก" &&
+                    data.status !== "ปิดงาน" &&
+                    data.status !== "ไม่อนุญาต" &&
+                    data.status !== "อนุญาต"
                       ? "text-warning"
                       : ""
                   }
                   ${
-                    data.urgent === "ด่วนมากที่สุด" && data.status !== "ปิดงาน"
+                    data.urgent === "ด่วนมากที่สุด" &&
+                    data.status !== "ปิดงาน" &&
+                    data.status !== "ไม่อนุญาต" &&
+                    data.status !== "อนุญาต"
                       ? "text-danger"
                       : ""
                   }`}
@@ -338,7 +369,10 @@ export default function User() {
                             textColor
                           )}`}
                         >
-                          {data.status}
+                          {data.status === "อนุญาต" ||
+                          data.status === "ไม่อนุญาต"
+                            ? "ปิดงาน"
+                            : data.status}
                         </td>
                         <td className="detail">
                           <Button

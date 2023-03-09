@@ -14,21 +14,26 @@ export default function Team() {
       />
       <Contents className="team-content">
         <div className="team-title">
-          <div>การพัฒนาระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ</div>
-          <div>Development of Information Data Center Service System</div>
+          <div>
+            โครงงานการพัฒนาเว็บแอปพลิเคชันระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ
+          </div>
+          <div>
+            Web Application Development of Information Data Center Service
+            System
+          </div>
         </div>
         <div className="team-name-title">คณะผู้จัดทำ</div>
         <div className="team-name">
           <div className="name">1. นายศราวุฒิ บุตราช</div>
-          <div>รหัสประจําตัวนักศึกษา 63202040034</div>
+          <div>63202040034</div>
         </div>
         <div className="team-name">
           <div className="name">2. นายรชต สมนึกในธรรม</div>
-          <div>รหัสประจําตัวนักศึกษา 63202040044</div>
+          <div>63202040044</div>
         </div>
         <div className="team-name">
           <div className="name">3. นางสาวดาราวัลย์ ผุยอุทา</div>
-          <div>รหัสประจําตัวนักศึกษา 63202040033</div>
+          <div>63202040033</div>
         </div>
         <div className="team-name-title">ครูที่ปรึกษา</div>
         <div className="team-name">

@@ -61,7 +61,8 @@ function SignupForm({ onSignup = () => null }) {
       email:
         (!email_check && "ต้องเป็นอีเมล @mvc.ac.th เท่านั้น") ||
         (!editProfile?.email && "กรอกอีเมล"),
-      faction: path && !editProfile?.user_faction && "กรุณาเพิ่มฝ่ายงาน",
+      faction:
+        path && editProfile?.user_faction?.length === 0 && "กรุณาเพิ่มฝ่ายงาน",
       title: !editProfile?.title && "กรุณาเลือกคำนำหน้า",
       first: !editProfile?.first_name && "กรอกชื่อจริง",
       last: !editProfile?.last_name && "กรอกนามสกุล",
@@ -78,6 +79,10 @@ function SignupForm({ onSignup = () => null }) {
         (!editProfile?.identity_id && "กรอกรหัสประจำตัว") ||
         (!identity_id && "รหัสบัตรประชาชนไม่ถูกต้อง"),
     });
+    console.log(
+      "log >> file: signup-form.js:107 >> checkData >> check:",
+      check
+    );
 
     if (
       !check.faction &&
@@ -89,7 +94,7 @@ function SignupForm({ onSignup = () => null }) {
       !check.identity_id &&
       !user_name &&
       (location.pathname === "/signup/officer"
-        ? editProfile?.user_faction
+        ? editProfile?.user_faction?.length > 0
         : editProfile) &&
       (location.pathname === "/signup/student" ? student_id : editProfile) &&
       editProfile?.title &&
@@ -263,7 +268,7 @@ function SignupForm({ onSignup = () => null }) {
         <Select
           data={title}
           name="title"
-          selectPlace="-"
+          selectPlace="-เลือกคำนำหน้า-"
           title={"คำนำหน้า"}
           value={editProfile?.title}
           onChange={onChangeText}

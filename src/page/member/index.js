@@ -309,7 +309,7 @@ export default function Member() {
         </Contents>
         {confilm.open && (
           <PopupJs.jsx
-            title={<div className="text-center">คุณต้องการลบข้อมูลไหม</div>}
+            title={<div className="text-center">ยืนยันการลบข้อมูล</div>}
             open={confilm.open && true}
             onClose={() => setConfilm({ open: false, id: "" })}
             maxWidth="300px"

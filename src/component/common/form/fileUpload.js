@@ -40,6 +40,8 @@ const Style = styled.span`
   label: file-upload;
 
   position: relative;
+  height: fit-content;
+
   .upload-icon {
     display: flex;
     justify-content: center;

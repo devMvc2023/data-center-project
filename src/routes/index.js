@@ -1,4 +1,4 @@
-import { GetOne } from "api";
+import { GetAll, GetOne } from "api";
 import LoadingPage from "component/element/loading";
 import useProfile from "hooks/useProfile";
 import { NeedUser, NotFound } from "page/brower-error";
@@ -23,7 +23,7 @@ function Router() {
   const [loading, setLoading] = useState(false);
   const cookies = new Cookies();
 
-  const { profile, setProfile } = useProfile();
+  const { profile, setProfile, setLink } = useProfile();
 
   useEffect(() => {
     const token = cookies.get("_token_");
@@ -33,13 +33,16 @@ function Router() {
 
       let data = [];
 
-      data = await GetOne("user", token);
+      if (token) data = await GetOne("user", token);
+
+      const manual = await GetAll("Manual");
 
       setProfile({ ...data });
+      setLink(manual[0].link);
       setLoading(false);
     };
 
-    if (token && !profile) getProfile();
+    getProfile();
   }, []);
 
   return (

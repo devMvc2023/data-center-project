@@ -9,7 +9,7 @@ import Cookies from "universal-cookie";
 function Sidebar({ ...props }) {
   const [show, setShow] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const { profile, setProfile } = useProfile();
+  const { profile, setProfile, link } = useProfile();
 
   const mainRef = useRef(null);
   const cookies = new Cookies();
@@ -21,7 +21,6 @@ function Sidebar({ ...props }) {
   const navigate = useNavigate();
 
   const onLogout = () => {
-    // window.localStorage.removeItem("_token_");
     cookies.remove("_token_");
 
     setProfile([]);
@@ -124,6 +123,14 @@ function Sidebar({ ...props }) {
                 </div>
                 <div className="menu-title">คณะผู้จัดทำ</div>
               </Link>
+            )}
+            {(profile?.role === "member" || !profile?.data_id) && link && (
+              <a className={`sidebar-menu-item`} href={link} target={"_blank"}>
+                <div className="menu-icon">
+                  <i className="fas fa-book" />
+                </div>
+                <div className="menu-title">คู่มือการใช้</div>
+              </a>
             )}
           </div>
 

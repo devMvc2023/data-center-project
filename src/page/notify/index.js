@@ -221,7 +221,7 @@ export default function Notify() {
 
       const repairs_list = await GetAll("repairs_list");
 
-      setRepairs(repairs_list);
+      setRepairs(repairs_list.sort((a, b) => a.id - b.id));
       setLoading(false);
     };
 
@@ -324,7 +324,7 @@ export default function Notify() {
                   style={"2"}
                   width="fit-content"
                   name="since_date"
-                  type={"datetime-local"}
+                  type={"date"}
                   value={notifyData.location}
                   onChange={onChangeText}
                   errorMsg={check?.since_date}
@@ -339,7 +339,7 @@ export default function Notify() {
                   style={"2"}
                   name="up_date"
                   width="fit-content"
-                  type={"datetime-local"}
+                  type={"date"}
                   value={notifyData.location}
                   onChange={onChangeText}
                   errorMsg={check?.up_date}
@@ -350,17 +350,16 @@ export default function Notify() {
             <Group2 className="group-image notify-group">
               <label className="image-title">ภาพประกอบ</label>
 
-              {notifyData?.images?.length === 0 && (
-                <FileUpload
-                  radius="none"
-                  className="file-upload"
-                  icon="fas fa-image"
-                  accept="image/*"
-                  disabled={notifyData?.images?.length === 10}
-                  onChange={onUpload}
-                  plusIcon={true}
-                />
-              )}
+              <FileUpload
+                radius="none"
+                className="file-upload"
+                icon="fas fa-image"
+                accept="image/*"
+                disabled={notifyData?.images?.length === 10}
+                onChange={onUpload}
+                plusIcon={true}
+              />
+
               {notifyData.images?.length > 0 && (
                 <div className="image-group">
                   {notifyData.images?.map((image, index) => {
@@ -588,7 +587,7 @@ const StyleExtendsSection = styled(Section)`
       position: relative;
       display: flex;
       flex-direction: row;
-      margin: 10px 10px 0 0;
+      margin: 0 10px 10px 0;
       width: 106px;
       height: 106px;
 
@@ -626,11 +625,16 @@ const StyleExtendsSection = styled(Section)`
       flex-wrap: wrap;
     }
 
+    .file-upload {
+      margin-right: 10px;
+    }
+
     ${breakpoint("XS")} {
       flex-direction: column;
       margin: 20px 0 0 0;
 
       .file-upload {
+        margin-bottom: 10px;
         width: fit-content;
       }
     }

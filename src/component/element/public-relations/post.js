@@ -150,6 +150,10 @@ const Style = styled.div`
     display: flex;
     flex-wrap: wrap;
     box-shadow: 0 0 4px #00000050;
+
+    img {
+      cursor: pointer;
+    }
   }
 
   .post-image2 {

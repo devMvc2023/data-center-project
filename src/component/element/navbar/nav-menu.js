@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 
 export default function NavMenu() {
   const { pathname } = useLocation();
-  const { profile } = useProfile();
+  const { profile, link } = useProfile();
 
   return (
     <Style>
@@ -50,7 +50,7 @@ export default function NavMenu() {
           }`}
         >
           <i className="fas fa-users" />
-          คณะผู้จัดทำ
+          ผู้จัดทำ
         </Link>
       )}
       {profile?.data_id && (
@@ -74,6 +74,12 @@ export default function NavMenu() {
             </Link>
           )}
         </>
+      )}
+      {(profile?.role === "member" || !profile?.data_id) && link && (
+        <a className={`nav-menu`} href={link} target={"_blank"}>
+          <i className="fas fa-book" />
+          คู่มือการใช้
+        </a>
       )}
     </Style>
   );

@@ -101,10 +101,10 @@ export default function RehearsalDetail({
       const res = await UPDATE("notify_data", dataUpdata, dataDetail.data_id);
       emailjs
         .send(
-          "service_ubpy3m4",
-          "template_ak7vl59",
+          "service_5sy3iwq",
+          "template_009jvoe",
           message,
-          "LXXEqL7ARI5DX2cXO"
+          "k6GJNXlcf6z8Qb_VG"
         )
         .then(
           (result) => {
@@ -232,10 +232,10 @@ export default function RehearsalDetail({
       );
       emailjs
         .send(
-          "service_ubpy3m4",
-          "template_ak7vl59",
+          "service_5sy3iwq",
+          "template_009jvoe",
           message,
-          "LXXEqL7ARI5DX2cXO"
+          "k6GJNXlcf6z8Qb_VG"
         )
         .then(
           (result) => {
@@ -304,78 +304,96 @@ export default function RehearsalDetail({
             >
               ปิด
             </Button>
-            {dataDetail?.status === "รอคิว" && profile && (
+            {profile?.data_id !== dataDetail?.user_id &&
+              (profile?.role === "super admin" || profile?.allow_work) && (
+                <Button
+                  type="button"
+                  margin="0 10px 0 0"
+                  width="60px"
+                  bgc="#ff0000"
+                  onClick={() =>
+                    setConfilm({
+                      open: true,
+                    })
+                  }
+                >
+                  ลบ
+                </Button>
+              )}
+            {profile?.data_id && (
               <>
-                {profile?.data_id === dataDetail?.user_id && (
-                  <div className="d-flex">
-                    <Button
-                      type="button"
-                      margin="0 10px 0 0"
-                      width="60px"
-                      bgc="#ff0000"
-                      onClick={() =>
-                        setConfilm({
-                          open: true,
-                        })
-                      }
-                    >
-                      ลบ
-                    </Button>
-                    <Button
-                      type="button"
-                      margin="0 0 0 0"
-                      width="60px"
-                      bgc="#0d6efd"
-                      onClick={onEdit}
-                    >
-                      แก้ไข
-                    </Button>
-                  </div>
+                {dataDetail?.status === "รอคิว" && profile && (
+                  <>
+                    {profile?.data_id === dataDetail?.user_id && (
+                      <div className="d-flex">
+                        <Button
+                          type="button"
+                          margin="0 10px 0 0"
+                          width="60px"
+                          bgc="#ff0000"
+                          onClick={() =>
+                            setConfilm({
+                              open: true,
+                            })
+                          }
+                        >
+                          ลบ
+                        </Button>
+                        <Button
+                          type="button"
+                          margin="0 0 0 0"
+                          width="60px"
+                          bgc="#0d6efd"
+                          onClick={onEdit}
+                        >
+                          แก้ไข
+                        </Button>
+                      </div>
+                    )}
+                    {dataDetail?.repairs_list !== "ประชาสัมพันธ์ข่าวสาร" &&
+                      profile?.role !== "member" && (
+                        <Button
+                          type="button"
+                          onClick={() => onUpdateData("กำลังดำเนินการ")}
+                          margin="0 0 0 10px"
+                          bgc="var(--green-1)"
+                          width="4rem"
+                        >
+                          รับงาน
+                        </Button>
+                      )}
+                    {dataDetail?.repairs_list === "ประชาสัมพันธ์ข่าวสาร" &&
+                      profile?.role !== "member" && (
+                        <>
+                          <Button
+                            type="button"
+                            onClick={() => onUpdateData("ไม่อนุญาต")}
+                            margin="0 0 0 10px"
+                            bgc="var(--red-1)"
+                            width="6rem"
+                          >
+                            ไม่อนุญาต
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => onUpdateData("อนุญาต")}
+                            margin="0 0 0 10px"
+                            bgc="var(--green-1)"
+                            width="4rem"
+                          >
+                            อนุญาต
+                          </Button>
+                        </>
+                      )}
+                  </>
                 )}
-                {dataDetail?.repairs_list !== "ประชาสัมพันธ์ข่าวสาร" &&
-                  profile?.role !== "member" && (
-                    <Button
-                      type="button"
-                      onClick={() => onUpdateData("กำลังดำเนินการ")}
-                      margin="0 0 0 10px"
-                      bgc="var(--green-1)"
-                      width="4rem"
-                    >
-                      รับงาน
-                    </Button>
-                  )}
-                {dataDetail?.repairs_list === "ประชาสัมพันธ์ข่าวสาร" &&
+
+                {(dataDetail?.status === "กำลังดำเนินการ" ||
+                  dataDetail?.status === "รออะไหล่") &&
+                  profile &&
                   profile?.role !== "member" && (
                     <>
-                      <Button
-                        type="button"
-                        onClick={() => onUpdateData("ไม่อนุญาต")}
-                        margin="0 0 0 10px"
-                        bgc="var(--red-1)"
-                        width="6rem"
-                      >
-                        ไม่อนุญาต
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={() => onUpdateData("อนุญาต")}
-                        margin="0 0 0 10px"
-                        bgc="var(--green-1)"
-                        width="4rem"
-                      >
-                        อนุญาต
-                      </Button>
-                    </>
-                  )}
-              </>
-            )}
-
-            {(dataDetail?.status === "กำลังดำเนินการ" ||
-              dataDetail?.status === "รออะไหล่") &&
-              profile &&
-              profile?.role !== "member" && (
-                <>
-                  {/* <Button
+                      {/* <Button
                     type="button"
                     onClick={() => onUpdateData("ไม่สำเร็จ")}
                     margin="0 0 0 0"
@@ -384,67 +402,71 @@ export default function RehearsalDetail({
                     ไม่สำเร็จ
                   </Button> */}
 
-                  <Button
-                    type="button"
-                    onClick={() => onUpdateData("ปิดงาน")}
-                    margin="0 0 0 0"
-                    bgc="var(--green-6)"
-                    width="5rem"
-                  >
-                    ปิดงาน
-                  </Button>
-                </>
-              )}
-
-            {(dataDetail?.status === "ปิดงาน" ||
-              dataDetail?.status === "อนุญาต" ||
-              dataDetail?.status === "ไม่อนุญาต") && (
-              <div className="d-flex">
-                {profile &&
-                  (profile?.data_id === dataDetail?.user_id ||
-                    profile?.role !== "member") && (
-                    <>
-                      <CustomButton
+                      <Button
                         type="button"
-                        bgc="var(--red-2)"
-                        width={"11rem"}
-                        className="custom-button"
-                        margin="0 10px 0 0"
+                        onClick={() => onUpdateData("ปิดงาน")}
+                        margin="0 0 0 0"
+                        bgc="var(--green-6)"
+                        width="5rem"
                       >
-                        <PDFDownloadLink
-                          document={<NotifyReport notifyData={dataDetail} />}
-                          fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
-                        >
-                          {({ blob, url, loading, error }) =>
-                            loading ? (
-                              <>
-                                <i className="fas fa-tools mx-1"></i>{" "}
-                                กำลังโหลดไฟล์
-                              </>
-                            ) : (
-                              <>
-                                <i className="fas fa-tools mx-1"></i>{" "}
-                                พิมใบการปฎิบัติงาน
-                              </>
-                            )
-                          }
-                        </PDFDownloadLink>
-                      </CustomButton>
+                        ปิดงาน
+                      </Button>
                     </>
                   )}
 
-                {profile && profile?.data_id === dataDetail.user_id && (
-                  <Button
-                    type="button"
-                    bgc="var(--red-7)"
-                    width={"6rem"}
-                    onClick={() => setRating({ open: true })}
-                    margin="0 auto 0 0"
-                  >
-                    ให้คะแนน
-                  </Button>
+                {(dataDetail?.status === "ปิดงาน" ||
+                  dataDetail?.status === "อนุญาต" ||
+                  dataDetail?.status === "ไม่อนุญาต") && (
+                  <div className="d-flex">
+                    {profile &&
+                      (profile?.data_id === dataDetail?.user_id ||
+                        profile?.role !== "member") && (
+                        <>
+                          <CustomButton
+                            type="button"
+                            bgc="var(--red-2)"
+                            width={"11rem"}
+                            className="custom-button"
+                            margin="0 10px 0 0"
+                          >
+                            <PDFDownloadLink
+                              document={
+                                <NotifyReport notifyData={dataDetail} />
+                              }
+                              fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
+                            >
+                              {({ blob, url, loading, error }) =>
+                                loading ? (
+                                  <>
+                                    <i className="fas fa-tools mx-1"></i>{" "}
+                                    กำลังโหลดไฟล์
+                                  </>
+                                ) : (
+                                  <>
+                                    <i className="fas fa-tools mx-1"></i>{" "}
+                                    พิมใบการปฎิบัติงาน
+                                  </>
+                                )
+                              }
+                            </PDFDownloadLink>
+                          </CustomButton>
+                        </>
+                      )}
+
+                    {profile && profile?.data_id === dataDetail.user_id && (
+                      <Button
+                        type="button"
+                        bgc="var(--red-7)"
+                        width={"6rem"}
+                        onClick={() => setRating({ open: true })}
+                        margin="0 auto 0 0"
+                      >
+                        ให้คะแนน
+                      </Button>
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </>
         }
@@ -590,9 +612,7 @@ export default function RehearsalDetail({
               <tr>
                 <th>ผู้ดำเนินการ</th>
                 <td>
-                  {(profile?.role === "super admin" ||
-                    profile?.role === "staff" ||
-                    profile?.allow_work) &&
+                  {(profile?.role === "super admin" || profile?.allow_work) &&
                   dataDetail?.status !== "ปิดงาน" ? (
                     <div className="d-flex">
                       <Select

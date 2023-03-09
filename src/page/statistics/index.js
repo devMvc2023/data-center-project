@@ -257,9 +257,14 @@ export default function Statistics() {
                         {
                           ydata.data.filter((d) =>
                             filter !== "ทั้งหมด"
-                              ? d.status === "ปิดงาน" &&
+                              ? (d.status === "ปิดงาน" ||
+                                  d.status === "ไม่อนุญาต" ||
+                                  d.status === "อนุญาต") &&
                                 d.repairs_list === filter
-                              : d.status === "ปิดงาน" && d
+                              : (d.status === "ปิดงาน" ||
+                                  d.status === "ไม่อนุญาต" ||
+                                  d.status === "อนุญาต") &&
+                                d
                           ).length
                         }
                       </td>
