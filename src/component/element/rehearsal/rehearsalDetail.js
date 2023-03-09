@@ -304,25 +304,25 @@ export default function RehearsalDetail({
             >
               ปิด
             </Button>
-            {profile?.data_id !== dataDetail?.user_id &&
-              (profile?.role === "super admin" || profile?.allow_work) && (
-                <Button
-                  type="button"
-                  margin="0 10px 0 0"
-                  width="60px"
-                  bgc="#ff0000"
-                  onClick={() =>
-                    setConfilm({
-                      open: true,
-                    })
-                  }
-                >
-                  ลบ
-                </Button>
-              )}
             {profile?.data_id && (
               <>
-                {dataDetail?.status === "รอคิว" && profile && (
+                {profile?.data_id !== dataDetail?.user_id &&
+                  (profile?.role === "super admin" || profile?.allow_work) && (
+                    <Button
+                      type="button"
+                      margin="0 10px 0 0"
+                      width="60px"
+                      bgc="#ff0000"
+                      onClick={() =>
+                        setConfilm({
+                          open: true,
+                        })
+                      }
+                    >
+                      ลบ
+                    </Button>
+                  )}
+                {dataDetail?.status === "รอคิว" && (
                   <>
                     {profile?.data_id === dataDetail?.user_id && (
                       <div className="d-flex">
@@ -390,7 +390,6 @@ export default function RehearsalDetail({
 
                 {(dataDetail?.status === "กำลังดำเนินการ" ||
                   dataDetail?.status === "รออะไหล่") &&
-                  profile &&
                   profile?.role !== "member" && (
                     <>
                       {/* <Button
@@ -418,42 +417,39 @@ export default function RehearsalDetail({
                   dataDetail?.status === "อนุญาต" ||
                   dataDetail?.status === "ไม่อนุญาต") && (
                   <div className="d-flex">
-                    {profile &&
-                      (profile?.data_id === dataDetail?.user_id ||
-                        profile?.role !== "member") && (
-                        <>
-                          <CustomButton
-                            type="button"
-                            bgc="var(--red-2)"
-                            width={"11rem"}
-                            className="custom-button"
-                            margin="0 10px 0 0"
+                    {(profile?.data_id === dataDetail?.user_id ||
+                      profile?.role !== "member") && (
+                      <>
+                        <CustomButton
+                          type="button"
+                          bgc="var(--red-2)"
+                          width={"11rem"}
+                          className="custom-button"
+                          margin="0 10px 0 0"
+                        >
+                          <PDFDownloadLink
+                            document={<NotifyReport notifyData={dataDetail} />}
+                            fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
                           >
-                            <PDFDownloadLink
-                              document={
-                                <NotifyReport notifyData={dataDetail} />
-                              }
-                              fileName={`รายงานการปฏิบัติงาน-${dataDetail.data_id}`}
-                            >
-                              {({ blob, url, loading, error }) =>
-                                loading ? (
-                                  <>
-                                    <i className="fas fa-tools mx-1"></i>{" "}
-                                    กำลังโหลดไฟล์
-                                  </>
-                                ) : (
-                                  <>
-                                    <i className="fas fa-tools mx-1"></i>{" "}
-                                    พิมใบการปฎิบัติงาน
-                                  </>
-                                )
-                              }
-                            </PDFDownloadLink>
-                          </CustomButton>
-                        </>
-                      )}
+                            {({ blob, url, loading, error }) =>
+                              loading ? (
+                                <>
+                                  <i className="fas fa-tools mx-1"></i>{" "}
+                                  กำลังโหลดไฟล์
+                                </>
+                              ) : (
+                                <>
+                                  <i className="fas fa-tools mx-1"></i>{" "}
+                                  พิมใบการปฎิบัติงาน
+                                </>
+                              )
+                            }
+                          </PDFDownloadLink>
+                        </CustomButton>
+                      </>
+                    )}
 
-                    {profile && profile?.data_id === dataDetail.user_id && (
+                    {profile?.data_id === dataDetail.user_id && (
                       <Button
                         type="button"
                         bgc="var(--red-7)"

@@ -17,7 +17,7 @@ const repairs_icon = [
   },
   {
     title: "ระบบ RMS",
-    detail: "fas fa-print",
+    detail: "fas fa-registered",
   },
   {
     title: "ประชาสัมพันธ์ข่าวสาร",
