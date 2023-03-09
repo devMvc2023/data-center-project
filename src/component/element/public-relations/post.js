@@ -7,19 +7,7 @@ export default function PublicPost({ data }) {
 
   return (
     <Style>
-      <div className="post-title">
-        <div className="title">{data?.note}</div>
-        <br />
-        <div className="tag">
-          {data?.symptom.map((tag, index) => {
-            return (
-              <span key={index}>
-                {index === 0 ? "" : ","} {tag}
-              </span>
-            );
-          })}
-        </div>
-      </div>
+      
       {data?.images.length === 1 && (
         <div className="post-image1 group-image">
           {data?.images?.map((img, index) => {
@@ -117,7 +105,20 @@ export default function PublicPost({ data }) {
           <img src={preview} alt="notify-preview" />
         </PopupJs.jsx>
       )}
-      <div className="post-footer"></div>
+      <div className="post-footer">
+      <div>{`ประชาสัมพันธ์ข่าวสาร ช่วงวันที่ ${data?.since_date} - ${data?.up_date}`}</div>
+
+      <div className="title">{data?.note ? `เรื่อง ${data?.note}`:''}</div>
+        <div className="tag">เกี่ยวข้องกับ 
+          {data?.symptom.map((tag, index) => {
+            return (
+              <span key={index}>
+                 {index === 0 ? "" : ","} {tag}
+              </span>
+            );
+          })}
+        </div>
+      </div>
     </Style>
   );
 }
