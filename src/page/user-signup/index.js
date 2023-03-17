@@ -24,10 +24,13 @@ function Signup() {
       title: editData.title,
       first_name: editData.first_name,
       last_name: editData.last_name,
+      title_en: editData.title_en,
+      first_name_en: editData.first_name_en,
+      last_name_en: editData.last_name_en,
       password: editData.password,
       phone: editData.phone,
       user_faction: editData?.user_faction || [],
-      user_name: editData?.user_name,
+      user_name: editData?.first_name_en.toLowerCase() + editData?.last_name_en?.substring(0, 2).toLowerCase(),
       identity_id: editData.identity_id || "",
       email: editData.email,
       role: "member",
@@ -40,7 +43,7 @@ function Signup() {
 
       if (res.id) {
         setLoading2(false);
-        setEditProfile(null);
+        setEditProfile({ user_faction: [] });
         navigate("/login");
       }
     } catch (error) {

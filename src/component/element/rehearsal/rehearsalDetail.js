@@ -1,5 +1,5 @@
 import { DELETE, GetAll, UPDATE } from "api";
-import { Button } from "component/common/page-layout/page-layout";
+import { Button, Group2 } from "component/common/page-layout/page-layout";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
 import { FindData, storage } from "component/common/util";
@@ -8,7 +8,7 @@ import { repairs_icon } from "array-data/repairs_icon";
 import styled from "@emotion/styled";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import NotifyReport from "../notify-report";
-import { Select } from "component/common/form";
+import { Input, Select } from "component/common/form";
 import LoadingPage from "../loading";
 import emailjs from "@emailjs/browser";
 import { deleteObject, ref } from "firebase/storage";
@@ -440,7 +440,7 @@ export default function RehearsalDetail({
                               ) : (
                                 <>
                                   <i className="fas fa-tools mx-1"></i>{" "}
-                                  พิมใบการปฎิบัติงาน
+                                  พิมพ์ใบการปฎิบัติงาน
                                 </>
                               )
                             }
@@ -661,18 +661,45 @@ export default function RehearsalDetail({
                 </td>
               </tr>
               <tr>
-                <th>หมายเหตุ</th>
+                <th>สถานะการปิดงาน</th>
                 <td>
                   {dataDetail?.status === "กำลังดำเนินการ" &&
-                  (profile?.role === "super admin" ||
-                    profile?.data_id === dataDetail?.user_id) ? (
+                  (profile?.role !== "member") ? (
+                    <>
+                  <Group2>
+                  <Input
+                    style={"4"}
+                    margin="0 20px 0 0"
+                    name="finish_note"
+                    value="ดำเนินการสำเร็จ"
+                    title={"สำเร็จ"}
+                    onChange={onChangeText}
+                  />
+                   <Input
+                    style={"4"}
+                    margin="0 20px 0 0"
+                    name="finish_note"
+                    value="ดำเนินการไม่สำเร็จ"
+                    title={"ไม่สำเร็จ"}
+                    onChange={onChangeText}
+                  />
+                   <Input
+                    style={"4"}
+                    margin="0 20px 0 0"
+                    name="finish_note"
+                    value="ไม่สามารถดำเนินการได้"
+                    title={"ทำไม่ได้"}
+                    onChange={onChangeText}
+                  />
+                  </Group2>
                     <textarea
                       name="finish_note"
                       value={dataDetail?.finish_note}
                       onChange={onChangeText}
                       className={`finish-note`}
-                      placeholder="กรอกหมายเหตุ"
+                      placeholder="สถานะการปิดงาน"
                     />
+                    </>
                   ) : (
                     <div className="note">{dataDetail?.finish_note || "-"}</div>
                   )}

@@ -15,11 +15,10 @@ export default function Team() {
       <Contents className="team-content">
         <div className="team-title">
           <div>
-            โครงงานการพัฒนาเว็บแอปพลิเคชันระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ
+           ระบบการให้บริการงานศูนย์ข้อมูลสารสนเทศ
           </div>
           <div>
-            Web Application Development of Information Data Center Service
-            System
+            Information Data Center Service System
           </div>
         </div>
         <div className="team-name-title">คณะผู้จัดทำ</div>
@@ -64,7 +63,7 @@ const StyleExtendsSection = styled(Section)`
   .team-title {
     font-size: 20px;
     font-weight: 900;
-    text-align: center;
+    // text-align: center;
   }
 
   .team-name-title {

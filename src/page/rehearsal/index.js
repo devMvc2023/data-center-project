@@ -59,6 +59,7 @@ export default function Rehersal() {
     setDataDetail(null);
   };
 
+  
   useEffect(() => {
     const getData = async () => {
       if (filterData.length === 0) setLoading2(true);

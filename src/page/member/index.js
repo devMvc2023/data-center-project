@@ -16,6 +16,7 @@ import UserDetail from "component/element/user/user-detail";
 import useProfile from "hooks/useProfile";
 import React, { useEffect, useState } from "react";
 import bcrypt from "bcryptjs";
+import { useNavigate } from "react-router-dom";
 
 export default function Member() {
   const [userData, setUserData] = useState();
@@ -34,7 +35,9 @@ export default function Member() {
   });
   const [check, setCheck] = useState({});
 
-  const { profile, loading, setLoading } = useProfile();
+  const navigate = useNavigate()
+
+  const { profile, loading, setLoading,setEditProfile } = useProfile();
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -43,31 +46,19 @@ export default function Member() {
     let conPass = true;
     let hashedPass = "";
 
-    const user_name = userData.some(
-      (d) =>
-        d.user_name === dataDetail2?.user_name &&
-        d.data_id !== dataDetail2?.data_id
-    );
-
-    if (confilmPass?.pass || confilmPass?.conPass) {
       pass = confilmPass?.pass.length >= 8;
       conPass = confilmPass?.pass === confilmPass.conPass;
       hashedPass = bcrypt.hashSync(confilmPass?.pass, 13);
-    }
+    
 
     setCheck({
-      user_name:
-        (!dataDetail2?.user_name && "กรอกข้อมูล") ||
-        (user_name && "มีคนใช้งานแล้ว"),
       pass: !pass && "รหัสผ่านต้องมีมากกว่าหรือเท่ากับ 8 ตัว",
       conPass: !conPass && "รหัสผ่านไม่ตรงกัน",
     });
 
     if (
-      !check?.user_name &&
       !check?.pass &&
       !check?.conPass &&
-      !user_name &&
       pass &&
       conPass
     ) {
@@ -91,6 +82,11 @@ export default function Member() {
       }
     }
   };
+
+  const onEditMember=()=>{
+    setEditProfile(dataDetail2)
+    navigate(`/member/${dataDetail2?.data_id}/edit`)
+  }
 
   const onEditUser = (data) => {
     setDataDetail2(data);
@@ -162,7 +158,7 @@ export default function Member() {
                 <td className="text-center">
                   {currentPage > 1 ? index + 1 + indexOfFirst : index + 1}
                 </td>
-                <td className="text-center">{data.user_name}</td>
+                <td >{data.user_name}</td>
                 <td>{`${data.title}${data.first_name} ${data.last_name}`}</td>
                 <td className="text-center">{data.phone}</td>
                 <td className="text-center">{data.role}</td>
@@ -218,7 +214,7 @@ export default function Member() {
               <PopupJs.jsx
                 title={`${dataDetail2?.title}${dataDetail2?.first_name} ${dataDetail2?.last_name}`}
                 open={dataDetail2 && true}
-                maxWidth="500px"
+                maxWidth="600px"
                 onClose={() => setDataDetail2(null)}
                 className="rehearsal-popup"
                 tagButtons={
@@ -227,7 +223,7 @@ export default function Member() {
                       fontSize="16px"
                       width={"100px"}
                       height="30px"
-                      margin="0 10px 0 0"
+                      margin="0 auto 0 0"
                       onClick={() =>
                         setConfilm({ open: true, id: dataDetail2?.data_id })
                       }
@@ -237,37 +233,31 @@ export default function Member() {
                     <Button
                       fontSize="16px"
                       height="30px"
-                      width="70px"
+                      width="140px"
                       bgc={"#0d6efd"}
-                      margin="0 0 0 0"
+                      margin="0 10px 0 0"
                       onClick={onUpdateUser}
                       disabled={
-                        dataDetail2?.user_name === confilmPass.user_name &&
                         !confilmPass?.pass &&
                         !confilmPass?.conPass
                       }
                     >
-                      อัปเดต
+                      เปลี่ยนรหัสผ่าน
+                    </Button>
+                    <Button
+                      fontSize="16px"
+                      height="30px"
+                      width="100px"
+                      bgc={"orange"}
+                      margin="0 0 0 0"
+                      onClick={onEditMember}
+                     
+                    >
+                      แก้ไขข้อมูล
                     </Button>
                   </EditButton>
                 }
               >
-                <Input
-                  value={dataDetail2?.user_name}
-                  onChange={(event) =>
-                    setDataDetail2({
-                      ...dataDetail2,
-                      user_name: event.target.value,
-                    })
-                  }
-                  title={"ชื่อผู้ใช้"}
-                  name="user_name"
-                  icon="fas fa-user"
-                  iconSize="17px"
-                  required
-                  margin="0"
-                  errorMsg={check?.user_name}
-                />
                 <Input
                   value={confilmPass?.pass}
                   onChange={(event) =>
@@ -276,6 +266,7 @@ export default function Member() {
                       pass: event.target.value,
                     })
                   }
+                  margin='0'
                   title={"รหัสผ่าน"}
                   name="user_name"
                   icon="fas fa-key"

@@ -37,13 +37,18 @@ export default function UserDetail({ data }) {
 
   return (
     <Style>
-      <Group2 className="member-group">
-        <Message2
+      <Message2
           className="user-name"
           title={"ชื่อ-นามสกุล"}
           detail={`${data?.title}${data?.first_name} ${data?.last_name}`}
         />
 
+      <Group2 className="member-group">
+      <Message2
+          className="user-name"
+          title={"name"}
+          detail={`${data?.title_en}${data?.first_name_en} ${data?.last_name_en}`}
+        />
         <Message2
           className="user-line_id"
           title={"ชื่อผู้ใช้"}

@@ -5,14 +5,14 @@ import {
   Group,
   Group2,
 } from "component/common/page-layout/page-layout";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { Input, Select } from "component/common/form";
 import useProfile from "hooks/useProfile";
 import { PopupJs } from "component/common/popup";
 import Table from "component/common/table";
 import { breakpoint } from "component/common/util";
-import { GetAll } from "api";
+import { GetAll, GetOne } from "api";
 
 function SignupForm({ onSignup = () => null }) {
   const [check, setCheck] = useState({});
@@ -25,10 +25,12 @@ function SignupForm({ onSignup = () => null }) {
   const [addData, setAddData] = useState([]);
   const [deleteData, setDeleteData] = useState([]);
   const [userData, setUserData] = useState([]);
+  const [titleEN, setTitleEN] = useState([]);
 
   const { profile, editProfile, setEditProfile, setLoading } = useProfile();
 
   const location = useLocation();
+  const params = useParams();
 
   const checkData = async (event) => {
     event.preventDefault();
@@ -37,7 +39,9 @@ function SignupForm({ onSignup = () => null }) {
     const path = location.pathname === "/signup/officer";
     let student_id = editProfile?.user_name?.length === 11;
     let user_name = [];
-    const user_check = /^[A-Za-z0-9]*$/.test(editProfile?.user_name);
+    // const user_check = /^[A-Za-z0-9]*$/.test(editProfile?.user_name);
+    const first_name_check = /^[A-Za-z]*$/.test(editProfile?.first_name_en);
+    const last_name_check = /^[A-Za-z]*$/.test(editProfile?.last_name_en);
     const email_check = /^\w+([\.-]?\w+)*@\mvc.ac.th/.test(editProfile?.email);
     const phone = editProfile?.phone?.length === 10;
 
@@ -47,11 +51,11 @@ function SignupForm({ onSignup = () => null }) {
     )
       user_name = userData.some((d) => d.user_name === editProfile?.user_name);
 
-    if (location.pathname === `/user/${profile?.data_id}/account/edit`)
+    if (location.pathname === `/user/${editProfile?.data_id}/account/edit`)
       user_name = userData.some(
         (d) =>
           d.user_name === editProfile?.user_name &&
-          d.data_id !== profile?.data_id
+          d.data_id !== editProfile?.data_id
       );
 
     setCheck({
@@ -66,45 +70,49 @@ function SignupForm({ onSignup = () => null }) {
       title: !editProfile?.title && "กรุณาเลือกคำนำหน้า",
       first: !editProfile?.first_name && "กรอกชื่อจริง",
       last: !editProfile?.last_name && "กรอกนามสกุล",
-      user_name:
-        (!editProfile?.user_name && "กรอกข้อมูล") ||
-        (user_name && "มีคนใช้แล้ว") ||
-        (!path &&
-          location.pathname !== `/user/${profile?.data_id}/account/edit` &&
-          !student_id &&
-          editProfile?.user_name &&
-          "รหัสนักศึกษาต้องมี 11 หลัก") ||
-        (!user_check && "ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษและตัวเลขเท่านั้น"),
+      first_en:
+        (!editProfile?.first_name_en && "กรอก First Name") ||
+        (!first_name_check && "กรุณากรอก First Name เป็นภาษาอังกฤษ"),
+      last_en:
+        (!editProfile?.last_name_en && "กรอก Last Name") ||
+        (!last_name_check && "กรุณากรอก Last Name เป็นภาษาอังกฤษ"),
+      // user_name:
+      //   (!editProfile?.user_name && "กรอกข้อมูล") ||
+      //   (user_name && "มีคนใช้แล้ว") ||
+      //   (!path &&
+      //     location.pathname !== `/user/${profile?.data_id}/account/edit` &&
+      //     student_id &&
+      //     editProfile?.user_name &&
+      //     "รหัสนักศึกษาต้องมี 11 หลัก") ||
+      //   (!user_check && "ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษและตัวเลขเท่านั้น"),
       identity_id:
         (!editProfile?.identity_id && "กรอกรหัสประจำตัว") ||
         (!identity_id && "รหัสบัตรประชาชนไม่ถูกต้อง"),
     });
-    console.log(
-      "log >> file: signup-form.js:107 >> checkData >> check:",
-      check
-    );
 
     if (
       !check.faction &&
-      !check.work &&
       !check.title &&
       !check.first &&
       !check.last &&
-      !check.user_name &&
+      // check.user_name &&
       !check.identity_id &&
-      !user_name &&
       (location.pathname === "/signup/officer"
         ? editProfile?.user_faction?.length > 0
         : editProfile) &&
       (location.pathname === "/signup/student" ? student_id : editProfile) &&
       editProfile?.title &&
-      editProfile?.user_name &&
+      // editProfile?.user_name &&
       editProfile?.first_name &&
       editProfile?.last_name &&
+      editProfile?.first_name_en &&
+      editProfile?.last_name_en &&
       editProfile?.email &&
       editProfile?.identity_id &&
       identity_id &&
-      user_check &&
+      // user_check &&
+      first_name_check &&
+      last_name_check &&
       email_check &&
       phone
     ) {
@@ -112,9 +120,8 @@ function SignupForm({ onSignup = () => null }) {
 
       const data = {
         ...editProfile,
-        password: profile?.password || hashedPass,
+        password: editProfile?.password || hashedPass,
       };
-
       onSignup(data);
     }
   };
@@ -222,12 +229,14 @@ function SignupForm({ onSignup = () => null }) {
       const position = await GetAll("position");
       const title = await GetAll("title");
       const user = await GetAll("user");
+      const title_en = await GetAll("title_en");
 
       setUserData(user);
       setFaction(faction.sort((a, b) => a.id - b.id));
       setSubject(subject.sort((a, b) => a.id - b.id));
       setPosition(position.sort((a, b) => a.id - b.id));
       setTitle(title.sort((a, b) => a.id - b.id));
+      setTitleEN(title_en.sort((a, b) => a.id - b.id));
       setEditProfile({ user_faction: [] });
 
       if (location.pathname === `/user/${profile?.data_id}/account/edit`) {
@@ -256,6 +265,13 @@ function SignupForm({ onSignup = () => null }) {
           user_faction: [],
         });
       }
+
+      if (location.pathname === `/member/${editProfile?.data_id}/edit`) {
+        const memberData = await GetOne("user", params?.member_id);
+
+        setEditProfile({ user_faction: [], ...memberData });
+      }
+
       setLoading(false);
     };
 
@@ -292,6 +308,37 @@ function SignupForm({ onSignup = () => null }) {
           onChange={onChangeText}
           width="38%"
           errorMsg={check?.last}
+          required
+        />
+      </Group>
+      <Group>
+        <Select
+          data={titleEN}
+          name="title_en"
+          selectPlace="-เลือกคำนำหน้า-"
+          title={"Title"}
+          value={editProfile?.title_en}
+          onChange={onChangeText}
+          errorMsg={check?.title}
+          width="22%"
+          required
+        />
+        <Input
+          value={editProfile?.first_name_en}
+          title="First Name"
+          name="first_name_en"
+          onChange={onChangeText}
+          width="38%"
+          errorMsg={check?.first_en}
+          required
+        />
+        <Input
+          value={editProfile?.last_name_en}
+          title="Last Name"
+          name="last_name_en"
+          onChange={onChangeText}
+          width="38%"
+          errorMsg={check?.last_en}
           required
         />
       </Group>
@@ -583,21 +630,28 @@ function SignupForm({ onSignup = () => null }) {
       )}
 
       <Group className="faction-group">
-        {location.pathname !== "/signup/student" && (
-          <Input
-            value={editProfile?.user_name}
-            title={"ชื่อผู้ใช้"}
-            name="user_name"
-            icon="fas fa-user"
-            iconSize="17px"
-            onChange={onChangeText}
-            errorMsg={check?.user_name}
-            required
-            placeholder2={"username"}
-            className="signup-input"
-          />
-        )}
-        {location.pathname === "/signup/student" && (
+        <Input
+          value={`${
+            profile && profile?.role === "super admin"
+              ? editProfile?.user_name
+              : editProfile?.first_name_en && editProfile?.last_name_en
+              ? `${
+                  editProfile?.first_name_en.toLowerCase() +
+                  editProfile?.last_name_en?.substring(0, 2).toLowerCase()
+                }`
+              : ""
+          }`}
+          title={"ชื่อผู้ใช้"}
+          name="user_name"
+          icon="fas fa-user"
+          iconSize="17px"
+          onChange={onChangeText}
+          errorMsg={check?.user_name}
+          disabled={profile?.role !== 'super admin'}
+          required
+          className="signup-input"
+        />
+        {/* {location.pathname === "/signup/student" && (
           <Input
             value={editProfile?.user_name}
             title={"รหัสนักศึกษา"}
@@ -610,7 +664,7 @@ function SignupForm({ onSignup = () => null }) {
             required
             className="signup-input"
           />
-        )}
+        )} */}
         <Input
           value={editProfile?.identity_id}
           title="รหัสประจำตัวประชาชน"
@@ -664,8 +718,9 @@ function SignupForm({ onSignup = () => null }) {
       )}
 
       <Button width="140px" onClick={checkData} margin="15px auto 0 auto">
-        {location.pathname === `/user/${profile?.data_id}/account/edit`
-          ? "แก้ไขข้อมูล"
+        {location.pathname === `/user/${profile?.data_id}/account/edit` ||
+        location.pathname === `/member/${editProfile?.data_id}/edit`
+          ? "บันทึกข้อมูล"
           : "ลงทะเบียน"}
       </Button>
     </Style>

@@ -36,6 +36,8 @@ const SortData = (data) => {
       data.status === "อนุญาต"
   );
 
+   currentData5.sort((a, b) => b.notify_date - a.notify_date)
+
   currentData1.push(
     ...currentData2,
     ...currentData3,

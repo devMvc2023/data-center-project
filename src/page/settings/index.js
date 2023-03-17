@@ -21,7 +21,8 @@ function Settings() {
   const [subject, setSubject] = useState();
   const [position, setPosition] = useState();
   const [repairs, setRepairs] = useState();
-  const [title, setTitle] = useState();
+  const [title, setTitle] = useState([]);
+  const [titleEN, setTitleEN] = useState([]);
   const [dataDetail, setDataDetail] = useState();
   const [confilm, setConfilm] = useState({
     open: false,
@@ -153,12 +154,14 @@ function Settings() {
       const position = await GetAll("position");
       const repairs = await GetAll("repairs_list");
       const title = await GetAll("title");
+      const title_en = await GetAll("title_en");
       const manual = await GetAll("Manual");
 
       setFaction(faction.sort((a, b) => a.id - b.id));
       setSubject(subject.sort((a, b) => a.id - b.id));
       setRepairs(repairs.sort((a, b) => a.id - b.id));
       setTitle(title.sort((a, b) => a.id - b.id));
+      setTitleEN(title_en.sort((a, b) => a.id - b.id));
       setPosition(position.sort((a, b) => a.id - b.id));
       setLink(manual[0]);
       setLoading(false);
@@ -232,29 +235,30 @@ function Settings() {
               </Group>
               <Group className="settings-group">
                 <div className="settings-table">
-                  <SettingsCollapse
-                    title="ตำแหน่ง"
-                    path="position"
-                    data={position}
-                    onEdit={(data) => onEditData(data, "position")}
+                <SettingsCollapse
+                    title="คำนำหน้า en"
+                    path="title_en"
+                    data={titleEN}
+                    onEdit={(data) => onEditData(data, "title_en")}
                     onEdit2={() =>
                       onEditData(
                         {
-                          id: position[position?.length - 1]?.id + 1,
+                          id: titleEN[titleEN?.length - 1]?.id + 1,
                           name: "",
                           detail: [],
                         },
-                        "position"
+                        "title_en"
                       )
                     }
                     onDelete={(data) =>
                       setConfilm({
                         open: true,
                         data: data,
-                        path: "position",
+                        path: "title_en",
                       })
                     }
                   />
+
                 </div>
                 <div className="settings-table">
                   <SettingsCollapse
@@ -280,6 +284,7 @@ function Settings() {
                       })
                     }
                   />
+
                 </div>
               </Group>
               <Group className="settings-group">
@@ -334,6 +339,34 @@ function Settings() {
                     </div>
                   </CollapseComplete>
                 </div>
+              </Group>
+              <Group className="settings-group">
+                <div className="settings-table">
+                  <SettingsCollapse
+                    title="ตำแหน่ง"
+                    path="position"
+                    data={position}
+                    onEdit={(data) => onEditData(data, "position")}
+                    onEdit2={() =>
+                      onEditData(
+                        {
+                          id: position[position?.length - 1]?.id + 1,
+                          name: "",
+                          detail: [],
+                        },
+                        "position"
+                      )
+                    }
+                    onDelete={(data) =>
+                      setConfilm({
+                        open: true,
+                        data: data,
+                        path: "position",
+                      })
+                    }
+                  />
+                </div>
+                
               </Group>
             </Contents>
             {confilm.open && (
@@ -422,7 +455,7 @@ function Settings() {
                       );
                     })}
 
-                    {path.path !== "position" && path.path !== "title" && (
+                    {path.path !== "position" && path.path !== "title"&& path.path !== "title_en" && (
                       <AddButton>
                         <div
                           className="add-button"

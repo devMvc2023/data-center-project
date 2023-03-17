@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { DELETE, POST, PUT, UPDATE } from "api";
+import { UPDATE } from "api";
 import Breadcrumbs from "component/common/breadcrumbs";
 import { FileUpload } from "component/common/form";
 import {
@@ -13,13 +13,15 @@ import SignupForm from "component/element/signup/signup-form";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import useProfile from "hooks/useProfile";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function UserEdit() {
   const [image, setImage] = useState([]);
   const [loading2, setLoading2] = useState(false);
 
-  const { profile, setProfile, setEditProfile, loading } = useProfile();
+  const { profile, setProfile, editProfile, setEditProfile, loading } =
+    useProfile();
+  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -30,12 +32,18 @@ export default function UserEdit() {
       title: editData.title,
       first_name: editData.first_name,
       last_name: editData.last_name,
+      title_en: editData.title_en,
+      first_name_en: editData.first_name_en,
+      last_name_en: editData.last_name_en,
       phone: editData.phone,
       user_faction: editData?.user_faction || null,
-      user_name: editData?.user_name,
-      user_image: urlImg[0] || profile.user_image || "",
+      user_name:
+        editData?.user_name ||
+        editData?.first_name_en.toLowerCase() +
+          editData?.last_name_en?.substring(0, 2).toLowerCase(),
+      user_image: urlImg[0] || editData.user_image || "",
       identity_id: editData.identity_id || "",
-      line_qr: urlImg[1] || profile.line_qr || "",
+      line_qr: urlImg[1] || editData.line_qr || "",
       line_id: editData.line_id || "",
     };
 
@@ -52,18 +60,31 @@ export default function UserEdit() {
             if (urlImg.length === image?.length) {
               data = {
                 ...data,
-                user_image: urlImg[0] || profile.user_image || "",
-                line_qr: urlImg[1] || profile.line_qr || "",
+                user_image: urlImg[0] || editData.user_image || "",
+                line_qr: urlImg[1] || editData.line_qr || "",
               };
 
               try {
-                const res = await UPDATE("user", data, profile.data_id);
+                const res = await UPDATE("user", data, editData.data_id);
 
-                if (res === "update success!") {
-                  setEditProfile(null);
+                if (
+                  res === "update success!" &&
+                  location.pathname ===
+                    `/user/${editData?.data_id}/account/edit`
+                ) {
+                  setEditProfile({ user_faction: [] });
                   setProfile({ ...profile, ...data });
                   setLoading2(false);
                   navigate(`/user/${profile?.data_id}/account`);
+                }
+
+                if (
+                  res === "update success!" &&
+                  location.pathname === `/member/${editData?.data_id}/edit`
+                ) {
+                  setEditProfile({ user_faction: [] });
+                  setLoading2(false);
+                  navigate(`/member`);
                 }
               } catch (error) {
                 console.log("error", error);
@@ -79,13 +100,25 @@ export default function UserEdit() {
         setLoading2(true);
         console.log("log >> file: edit.js:84 >> onUpdate >> data", data);
 
-        const res = await UPDATE("user", data, profile.data_id);
+        const res = await UPDATE("user", data, editData.data_id);
 
-        if (res === "update success!") {
-          setEditProfile(null);
+        if (
+          res === "update success!" &&
+          location.pathname === `/user/${editData?.data_id}/account/edit`
+        ) {
+          setEditProfile({ user_faction: [] });
           setProfile({ ...profile, ...data });
           setLoading2(false);
           navigate(`/user/${profile?.data_id}/account`);
+        }
+
+        if (
+          res === "update success!" &&
+          location.pathname === `/member/${editData?.data_id}/edit`
+        ) {
+          setEditProfile({ user_faction: [] });
+          setLoading2(false);
+          navigate(`/member`);
         }
       } catch (error) {
         console.log("error", error);
@@ -114,13 +147,13 @@ export default function UserEdit() {
           <div className="edit-title ">ข้อมูลเกี่ยวกับบัญชี</div>
           <Group2 className="justify-content-around">
             <div className="edit-image img">
-              {image[0] || profile?.user_image ? (
+              {image[0] || editProfile?.user_image ? (
                 <>
                   <div className="image img">
                     {image[0] ? (
                       <img src={URL.createObjectURL(image[0])} alt="image" />
                     ) : (
-                      <img src={profile?.user_image} alt="image" />
+                      <img src={editProfile?.user_image} alt="image" />
                     )}
                   </div>
                   <FileUpload
@@ -148,13 +181,13 @@ export default function UserEdit() {
               )}
             </div>
             <div className="edit-image img2">
-              {image[1] || profile?.line_qr ? (
+              {image[1] || editProfile?.line_qr ? (
                 <>
                   <div className="image img2">
                     {image[1] ? (
                       <img src={URL.createObjectURL(image[1])} alt="image" />
                     ) : (
-                      <img src={profile?.line_qr} alt="image" />
+                      <img src={editProfile?.line_qr} alt="image" />
                     )}
                   </div>
                   <FileUpload

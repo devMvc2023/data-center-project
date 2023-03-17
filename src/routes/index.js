@@ -14,7 +14,7 @@ import Team from "page/team";
 import User from "page/user";
 import Login from "page/user-login";
 import Signup from "page/user-signup";
-import UserSettings from "page/user/edit";
+import UserEdit from "page/user/edit";
 import { useEffect, useState } from "react";
 import { Route, Routes as Switch } from "react-router-dom";
 import Cookies from "universal-cookie";
@@ -26,7 +26,7 @@ function Router() {
   const { profile, setProfile, setLink } = useProfile();
 
   useEffect(() => {
-    const token = cookies.get("_token_");
+    let token = cookies.get("_token_");
 
     const getProfile = async () => {
       setLoading(true);
@@ -35,6 +35,8 @@ function Router() {
 
       if (token) data = await GetOne("user", token);
 
+      token = ''
+      
       const manual = await GetAll("Manual");
 
       setProfile({ ...data });
@@ -68,7 +70,9 @@ function Router() {
           {profile?.data_id ? (
             <>
               {profile?.data_id && profile?.role !== "member" ? (
+                <>
                 <Route path="/member" element={<Member />} />
+                <Route path="/member/:member_id/edit" element={<UserEdit />} /></>
               ) : (
                 <Route path="*" element={<NotFound />} />
               )}
@@ -81,7 +85,7 @@ function Router() {
               <Route path="/user/:user_id/account" element={<User />} />
               <Route
                 path="/user/:user_id/account/edit"
-                element={<UserSettings />}
+                element={<UserEdit />}
               />
               <Route path="/notify" element={<Notify />} />
             </>

@@ -112,12 +112,12 @@ const NotifyReport = ({ notifyData }) => (
   <Document>
     <Page style={styles.page}>
       <View>
-        <Text style={[styles.title, styles.bold]}>ใบรายงานการปฎิบัติงาน</Text>
+        <Text style={[styles.title, styles.bold]}>รายงานการปฎิบัติงาน</Text>
       </View>
       <View style={[styles.dataGroup, styles.date]}>
         <Text style={[styles.groupWidth1]}></Text>
         <Text style={[styles.groupWidth2]}>
-          วันที่ขอรับบริการ 19 สิงหาคม 2566
+          วันที่ขอรับบริการ {notifyData.notify_date}
         </Text>
       </View>
       <View style={[styles.dataGroup, styles.bold]}>
