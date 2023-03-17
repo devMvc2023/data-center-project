@@ -188,7 +188,6 @@ export default function Statistics() {
             icon={"fas fa-chart-bar"}
             title="สถิติการให้บริการงานศูนย์ข้อมูลสารสนเทศ"
           />
-
           <Contents className="statistics-table-chart">
             <Select
               width="fit-content"
@@ -196,6 +195,12 @@ export default function Statistics() {
               data={["ทั้งหมด", ...repairs]}
               onChange={(event) => onFilter(event)}
             />
+            <div className="chart-title">สถิติการให้บริการปี {currentYear}</div>
+           
+            <Bar options={chartOption} data={chartData} />
+          </Contents>
+          <Contents className="statistics-table-chart">
+           
             <table className="table">
               <thead>
                 <tr>
@@ -284,10 +289,7 @@ export default function Statistics() {
               </tbody>
             </table>
           </Contents>
-          <Contents className="statistics-table-chart">
-            <div className="chart-title">สถิติการให้บริการปี {currentYear}</div>
-            <Bar options={chartOption} data={chartData} />
-          </Contents>
+          
         </div>
       </StyleExtendsSection>
       <LoadingPage loading={loading} />

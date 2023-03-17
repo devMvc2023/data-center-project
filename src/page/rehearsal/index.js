@@ -191,8 +191,9 @@ export default function Rehersal() {
                         <i
                           className={FindData(data.repairs_list, repairs_icon)}
                         />
-                        <div>{data.repairs_list}</div>
+                        {data.repairs_list}
                       </td>
+
                       <td className="contractor">{data.contractor}</td>
                       <td
                         className={`status text-center ${FindData(
@@ -273,13 +274,21 @@ const StyleExtendsSection = styled(Section)`
   }
 
   .rehearsal-content {
-    max-width: 1100px;
+    max-width: 1200px;
     padding: 20px;
     min-height: 560px;
     overflow: auto;
 
     select {
       font-weight: 900;
+    }
+
+    .name {
+      width: 200px;
+    }
+
+    .contractor {
+      width: 200px;
     }
 
     ${breakpoint("MD")} {
@@ -298,13 +307,13 @@ const StyleExtendsSection = styled(Section)`
   }
 
   .rehearsal-breadcrumbs {
-    max-width: 1100px;
+    max-width: 1200px;
   }
 
   .table-body {
     min-height: 470px;
     .table {
-      ${breakpoint(1160)} {
+      ${breakpoint(1208)} {
         width: 1200px;
       }
     }

@@ -29,21 +29,21 @@ export default function PublicRelations() {
           date < new Date(data?.up_date?.seconds * 1000)
       );
 
-      // if (postData2) {
-      //   postData2.map((data) => {
-      //     const since_date = new Date(data?.since_date?.seconds * 1000);
-      //     const up_date = new Date(data?.up_date?.seconds * 1000);
+      if (postData2) {
+        postData2.map((data) => {
+          const since_date = new Date(data?.since_date?.seconds * 1000);
+          const up_date = new Date(data?.up_date?.seconds * 1000);
 
-      //     data.since_date = since_date.toLocaleDateString("th-TH", {
-      //       dateStyle: "medium",
-      //     });
-      //     data.up_date = up_date.toLocaleDateString("th-TH", {
-      //       dateStyle: "medium",
-      //     });
-      //   });
-      // }
+          data.since_date = since_date.toLocaleDateString("th-TH", {
+            dateStyle: "medium",
+          });
+          data.up_date = up_date.toLocaleDateString("th-TH", {
+            dateStyle: "medium",
+          });
+        });
+      }
 
-      setPost(postData2.sort((a, b) => a.notify_date - b.notify_date));
+      setPost(postData2.sort((a, b) =>  b.notify_date - a.notify_date));
       setLoading(false);
     };
 

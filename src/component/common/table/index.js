@@ -44,7 +44,6 @@ const Style = styled.div`
     border: none;
 
     .repairs-list {
-      display: flex;
       i {
         margin-right: 6px;
       }

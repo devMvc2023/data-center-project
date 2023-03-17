@@ -249,7 +249,7 @@ export default function Notify() {
               detail={`${profile?.title}${profile?.first_name} ${profile?.last_name}`}
             />
             <Select
-              title="บริการ"
+              title="เรื่องที่ขอรับบริการ"
               width="fit-content"
               data={repairs}
               selectWidth="220px"

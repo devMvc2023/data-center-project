@@ -360,7 +360,7 @@ export default function User() {
                               repairs_icon
                             )}
                           />
-                          <div>{data.repairs_list}</div>
+                          {data.repairs_list}
                         </td>
                         <td className="text-center">{data.urgent}</td>
                         <td
