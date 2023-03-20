@@ -30,7 +30,10 @@ function Signup() {
       password: editData.password,
       phone: editData.phone,
       user_faction: editData?.user_faction || [],
-      user_name: editData?.first_name_en.toLowerCase() + editData?.last_name_en?.substring(0, 2).toLowerCase(),
+      user_name:
+        editData?.user_name ||
+        editData?.first_name_en.toLowerCase() +
+          editData?.last_name_en?.substring(0, 2).toLowerCase(),
       identity_id: editData.identity_id || "",
       email: editData.email,
       role: "member",
