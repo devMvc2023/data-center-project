@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { breakpoint, storage } from "component/common/util";
 import { ref, uploadBytes } from "firebase/storage";
 import LoadingPage from "component/element/loading";
-
+//
 export default function Notify() {
   const [notifyData, setNotifyData] = useState({
     images: [],
@@ -313,6 +313,19 @@ export default function Notify() {
                 onChange={onChangeText}
               />
             )}
+
+            {notifyData.repairs_list === "เครื่อง Computer" && (
+              <Message
+                title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ"
+              />
+            )}
+
+            {notifyData.repairs_list === "เครื่อง Notebook" && (
+              <Message
+                title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ"
+              />
+            )}
+
             {notifyData.repairs_list === "ประชาสัมพันธ์ข่าวสาร" && (
               <Group2 className="notify-group">
                 <Input
