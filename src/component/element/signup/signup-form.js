@@ -37,6 +37,7 @@ function SignupForm({ onSignup = () => null }) {
 
     const identity_id = editProfile?.identity_id?.length === 13;
     const path = location.pathname === "/signup/officer";
+    console.log("log >> file: signup-form.js:40 >> checkData >> path:", path);
     let student_id = editProfile?.user_name?.length === 11;
     let user_name = [];
     const user_check = /^[A-Za-z0-9]*$/.test(editProfile?.user_name);
@@ -80,7 +81,7 @@ function SignupForm({ onSignup = () => null }) {
         (!editProfile?.last_name_en && "กรอก Last Name") ||
         (!last_name_check && "กรุณากรอก Last Name เป็นภาษาอังกฤษ"),
       user_name:
-        (!editProfile?.user_name && "กรอกข้อมูล") ||
+        (!path && !editProfile?.user_name && "กรอกข้อมูล") ||
         (user_name && "มีคนใช้แล้ว") ||
         (!path &&
           location.pathname !== `/user/${profile?.data_id}/account/edit` &&
@@ -771,18 +772,18 @@ function SignupForm({ onSignup = () => null }) {
       </Group>
       {(location.pathname === `/user/${editProfile?.data_id}/account/edit` ||
         location.pathname === `/member/${editProfile?.data_id}/edit`) && (
-          <Group className="faction-group">
-            <Input
-              value={editProfile?.line_id}
-              title="ไลน์ไอดี"
-              icon="fab fa-line"
-              iconSize="20px"
-              name="line_id"
-              onChange={onChangeText}
-              className="signup-input"
-            />
-          </Group>
-        )}
+        <Group className="faction-group">
+          <Input
+            value={editProfile?.line_id}
+            title="ไลน์ไอดี"
+            icon="fab fa-line"
+            iconSize="20px"
+            name="line_id"
+            onChange={onChangeText}
+            className="signup-input"
+          />
+        </Group>
+      )}
 
       <Button width="140px" onClick={checkData} margin="15px auto 0 auto">
         {location.pathname === `/user/${profile?.data_id}/account/edit` ||

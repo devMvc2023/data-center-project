@@ -92,7 +92,7 @@ function Pagination({ perPage, totalData, page, paginate = () => null }) {
               }`}
             >
               <a className="page-link" onClick={prevbtn}>
-                Previous
+                ย้อนกลับ
               </a>
             </li>
             {pageDecrementBtn}
@@ -105,7 +105,7 @@ function Pagination({ perPage, totalData, page, paginate = () => null }) {
               }`}
             >
               <a className="page-link" onClick={nextbtn}>
-                Next
+                ต่อไป
               </a>
             </li>
           </ul>
