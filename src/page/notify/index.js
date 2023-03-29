@@ -200,13 +200,11 @@ export default function Notify() {
 
   const onUpload = (event) => {
     const filesData = [...event.target.files];
-    const image = [];
 
-    filesData.map((data, index) => {
-      image[index] = URL.createObjectURL(data);
+    setNotifyData({
+      ...notifyData,
+      images: [...filesData, ...notifyData?.images],
     });
-
-    setNotifyData({ ...notifyData, images: filesData });
   };
 
   const deleteFile = (event) => {
@@ -315,15 +313,11 @@ export default function Notify() {
             )}
 
             {notifyData.repairs_list === "เครื่อง Computer" && (
-              <Message
-                title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ"
-              />
+              <Message title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ" />
             )}
 
             {notifyData.repairs_list === "เครื่อง Notebook" && (
-              <Message
-                title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ"
-              />
+              <Message title="หมายเหตุ : เพื่อความสะดวกและรวดเร็วในการให้บริการ จึงขอความกรุณานำเครื่องมาที่งานศูนย์ข้อมูลสารสนเทศ" />
             )}
 
             {notifyData.repairs_list === "ประชาสัมพันธ์ข่าวสาร" && (
@@ -376,21 +370,45 @@ export default function Notify() {
               {notifyData.images?.length > 0 && (
                 <div className="image-group">
                   {notifyData.images?.map((image, index) => {
+                    console.log(
+                      "log >> file: index.js:375 >> {notifyData.images?.map >> image:",
+                      image
+                    );
                     return (
-                      <div className="notify-image-group" key={index}>
-                        <div
-                          className="notify-image"
-                          onClick={() => setPreview(URL.createObjectURL(image))}
-                        >
-                          <img src={URL.createObjectURL(image)} />
-                        </div>
-                        <div
-                          className="false-icon"
-                          onClick={() => deleteFile(index)}
-                        >
-                          <i className="fa fa-times" />
-                        </div>
-                      </div>
+                      <>
+                        {image.type === "image/png" ||
+                        image.type === "image/jpeg" ? (
+                          <div className="notify-image-group" key={index}>
+                            <div
+                              className="notify-image"
+                              onClick={() =>
+                                setPreview(URL.createObjectURL(image))
+                              }
+                            >
+                              <img src={URL.createObjectURL(image)} />
+                            </div>
+                            <div
+                              className="false-icon"
+                              onClick={() => deleteFile(index)}
+                            >
+                              <i className="fa fa-times" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="notify-image-group" key={index}>
+                            <div className="notify-file">
+                              <img src={require("image/file-icon.png")} />
+                            </div>
+                            <div className="notify-text">{image.name}</div>
+                            <div
+                              className="false-icon"
+                              onClick={() => deleteFile(index)}
+                            >
+                              <i className="fa fa-times" />
+                            </div>
+                          </div>
+                        )}
+                      </>
                     );
                   })}
                 </div>
@@ -598,8 +616,6 @@ const StyleExtendsSection = styled(Section)`
 
     .notify-image-group {
       position: relative;
-      display: flex;
-      flex-direction: row;
       margin: 0 10px 10px 0;
       width: 106px;
       height: 106px;
@@ -615,6 +631,27 @@ const StyleExtendsSection = styled(Section)`
         img {
           object-fit: cover;
         }
+      }
+
+      .notify-file {
+        width: 100px;
+        height: 80px;
+
+        &:hover {
+          cursor: zoom-in;
+        }
+
+        img {
+          object-fit: contain;
+        }
+      }
+
+      .notify-text {
+        width: 100px;
+        height: 20px;
+        text-align: center;
+        word-break: break-all;
+        overflow: hidden;
       }
 
       .false-icon {
